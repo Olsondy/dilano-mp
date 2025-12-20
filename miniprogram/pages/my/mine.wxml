@@ -1,0 +1,45 @@
+<view class="page-container">
+  <navigation-bar title="个人中心" back="{{true}}" color="black" background="#FFF"></navigation-bar>
+  <view class="user-header">
+    <view class="avatar-wrapper">
+      <image class="avatar" src="/static/avatar.png"></image>
+      <view class="avatar-ring"></view> </view>
+    <view class="user-main">
+      <text class="nickname">未登录</text>
+      <text class="phone">ID:rajputakshay8940</text>
+    </view>
+  </view>
+
+  <view class="stats-board">
+    <view class="stats-item">
+      <view class="stats-icon-box commission">
+        <text class="icon">¥</text>
+      </view>
+      <view class="stats-content">
+        <text class="stats-val">12,850.00</text>
+        <text class="stats-label">总收入佣金</text>
+      </view>
+    </view>
+    <view class="stats-divider"></view>
+    <view class="stats-item">
+      <view class="stats-icon-box referrer">
+        <text class="icon">👤</text>
+      </view>
+      <view class="stats-content">
+        <text class="stats-val">暂无</text>
+        <text class="stats-label">推荐人</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="menu-group">
+    <view class="menu-cell" wx:for="{{menuItems}}" wx:key="index" hover-class="cell-active">
+      <view class="cell-left">
+        <text class="cell-title">{{item.title}}</text>
+      </view>
+      <view class="cell-right">
+        <view class="arrow-icon"></view>
+      </view>
+    </view>
+  </view>
+</view>

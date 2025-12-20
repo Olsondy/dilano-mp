@@ -1,0 +1,78 @@
+@import "../styles/theme.less";
+
+.tab-bar {
+  position: fixed;
+  bottom: 40rpx;
+  left: 40rpx;
+  right: 40rpx;
+  height: 120rpx;
+  background: white; // White background
+  border-radius: 60rpx;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.05); // Lighter shadow
+  border: 1rpx solid @border-color;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  overflow: hidden;
+
+  // 共享的背景滑块
+  .active-bg {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    z-index: 0;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: left;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .active-bg-inner {
+      width: 85%;
+      height: 90rpx;
+      background: @tab-active-bg; 
+      border-radius: 45rpx;
+    }
+  }
+
+  &-item {
+    flex: 1;
+    height: 100%;
+    position: relative;
+    .flex-center;
+    z-index: 2;
+
+    .item-content {
+      .flex-center;
+      transition: all 0.3s ease;
+      
+      .tab-icon {
+        width: 44rpx;
+        height: 44rpx;
+        opacity: 0.8;
+      }
+
+      .tab-text {
+        font-size: 26rpx;
+        margin-left: 12rpx;
+        font-weight: 600;
+        color: @tab-inactive-color;
+        transition: color 0.3s ease;
+
+        &.text-active {
+          color: @tab-active-color;
+          opacity: 1;
+        }
+      }
+    }
+
+    &.item-active {
+      .item-content {
+        .tab-icon {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}

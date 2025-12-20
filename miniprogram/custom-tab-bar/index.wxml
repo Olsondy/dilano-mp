@@ -1,0 +1,22 @@
+<view class="tab-bar">
+  <!-- 这里的 active-bg 是共享的滑块，用来实现 Slide 过渡效果 -->
+  <view 
+    class="active-bg" 
+    style="width: {{100 / list.length}}%; left: {{selected === 0 ? '0%' : (selected * 100 / list.length) + '%'}};"
+  >
+    <view class="active-bg-inner"></view>
+  </view>
+
+  <view 
+    wx:for="{{list}}" 
+    wx:key="index" 
+    class="tab-bar-item {{selected === index ? 'item-active' : ''}}" 
+    bindtap="switchTab" 
+    data-path="{{item.pagePath}}" 
+    data-index="{{index}}"
+  >
+    <view class="item-content">
+      <text class="tab-text {{selected === index ? 'text-active' : ''}}">{{item.text}}</text>
+    </view>
+  </view>
+</view>
