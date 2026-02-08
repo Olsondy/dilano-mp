@@ -1,45 +1,140 @@
+<!--miniprogram/pages/my/mine.wxml-->
 <view class="page-container">
-  <navigation-bar title="个人中心" back="{{true}}" color="black" background="#FFF"></navigation-bar>
-  <view class="user-header">
-    <view class="avatar-wrapper">
-      <image class="avatar" src="/static/avatar.png"></image>
-      <view class="avatar-ring"></view> </view>
-    <view class="user-main">
-      <text class="nickname">未登录</text>
-      <text class="phone">ID:rajputakshay8940</text>
+  <t-toast id="t-toast" />
+  <navigation-bar title="{{text.pageTitle}}" back="{{false}}" color="#000" background="#FFF"></navigation-bar>
+  
+  <view class="content-wrapper">
+    <!-- Profile Header -->
+    <view class="profile-section">
+      <view class="avatar-container">
+         <image class="avatar" src="{{userInfo.avatar}}" mode="aspectFill"></image>
+      </view>
+      <view class="profile-info">
+        <view class="name-row">
+            <text class="nickname">{{userInfo.nickname}}</text>
+            <view class="role-badge">{{userInfo.role}}</view>
+        </view>
+        <text class="user-id" bindtap="handleCopyId">{{userInfo.phone}}</text>
+      </view>
+    </view>
+
+    <!-- Stats Grid (Linear Style) -->
+    <view class="stats-grid">
+      <view class="stat-card">
+        <text class="stat-label">{{text.commissionLabel}}</text>
+        <text class="stat-value">¥{{commission}}</text>
+      </view>
+      <view class="stat-card">
+        <text class="stat-label">{{text.referrerLabel}}</text>
+        <text class="stat-value">{{referrer}}</text>
+      </view>
+    </view>
+
+    <!-- General Section -->
+    <view class="menu-group">
+        <view class="section-label">{{text.generalSection}}</view>
+        <view class="menu-list">
+            <!-- Language Switcher (New) -->
+            <view class="menu-item" hover-class="item-active" bindtap="toggleLanguage">
+                <text class="item-text">{{text.language}}</text>
+                <view class="item-right">
+                    <text class="value-text">{{currentLang === 'en' ? 'English' : '中文'}}</text>
+                    <view class="arrow-right"></view>
+                </view>
+            </view>
+
+            <view class="menu-item" hover-class="item-active" bindtap="openReferrals">
+                <text class="item-text">{{text.referrals}}</text>
+                <view class="item-right">
+                    <view class="arrow-right"></view>
+                </view>
+            </view>
+        </view>
+    </view>
+
+    <!-- Support Section -->
+    <view class="menu-group">
+        <view class="section-label">{{text.supportSection}}</view>
+        <view class="menu-list">
+            <view class="menu-item" hover-class="item-active" bindtap="handlePrivacy">
+                <text class="item-text">{{text.privacy}}</text>
+                <view class="item-right">
+                    <view class="arrow-right"></view>
+                </view>
+            </view>
+             <view class="menu-item" hover-class="item-active">
+                <text class="item-text">{{text.about}}</text>
+                <view class="item-right">
+                    <view class="arrow-right"></view>
+                </view>
+            </view>
+             <view class="menu-item" hover-class="item-active" bindtap="handleLogout">
+                <text class="item-text" style="color: #E5484D;">{{text.logout}}</text>
+            </view>
+        </view>
+    </view>
+
+    <view class="footer-info">
+        <text>{{text.footer}}</text>
     </view>
   </view>
 
-  <view class="stats-board">
-    <view class="stats-item">
-      <view class="stats-icon-box commission">
-        <text class="icon">¥</text>
+  <!-- Login Popup -->
+  <t-popup visible="{{showLogin}}" bind:visible-change="onVisibleChange" placement="bottom" close-on-overlay-click="{{false}}">
+    <view class="login-popup-content">
+      <view class="login-header">
+        <text class="login-title">身份验证</text>
+        <text class="login-desc">请授权手机号以访问您的账户信息</text>
       </view>
-      <view class="stats-content">
-        <text class="stats-val">12,850.00</text>
-        <text class="stats-label">总收入佣金</text>
-      </view>
-    </view>
-    <view class="stats-divider"></view>
-    <view class="stats-item">
-      <view class="stats-icon-box referrer">
-        <text class="icon">👤</text>
-      </view>
-      <view class="stats-content">
-        <text class="stats-val">暂无</text>
-        <text class="stats-label">推荐人</text>
-      </view>
-    </view>
-  </view>
 
-  <view class="menu-group">
-    <view class="menu-cell" wx:for="{{menuItems}}" wx:key="index" hover-class="cell-active">
-      <view class="cell-left">
-        <text class="cell-title">{{item.title}}</text>
+      <view class="privacy-row" bindtap="togglePrivacy">
+        <t-icon name="{{privacyAgreed ? 'check-circle-filled' : 'circle'}}" size="36rpx" color="{{privacyAgreed ? '#18181B' : '#999'}}" />
+        <view class="privacy-text">
+            <text>我已阅读并同意</text>
+            <text class="link" catchtap="handlePrivacy">《隐私协议》</text>
+        </view>
       </view>
-      <view class="cell-right">
-        <view class="arrow-icon"></view>
-      </view>
+
+      <t-button 
+        wx:if="{{!privacyAgreed}}"
+        t-class="login-btn-black"
+        theme="primary" 
+        size="large" 
+        block 
+        bind:tap="handleLoginCheck"
+      >
+        手机号一键登录
+      </t-button>
+
+      <t-button 
+        wx:else
+        t-class="login-btn-black"
+        theme="primary" 
+        size="large" 
+        block 
+        open-type="getPhoneNumber" 
+        bind:getphonenumber="handleLogin"
+      >
+        手机号一键登录
+      </t-button>
     </view>
-  </view>
+  </t-popup>
+
+  <!-- Referral List Popup -->
+  <t-popup visible="{{showReferrals}}" bind:visible-change="onReferralsVisibleChange" placement="bottom">
+    <view class="referral-popup-content">
+      <view class="referral-header">
+        <text class="title">{{text.referrals}}</text>
+        <view class="close-btn" bindtap="closeReferrals">✕</view>
+      </view>
+      <scroll-view scroll-y class="referral-list">
+        <block wx:for="{{referralList}}" wx:key="id">
+            <view class="referral-item">
+                <text class="name">{{item.partyName}}</text>
+            </view>
+        </block>
+        <view class="list-footer">Total: {{referralList.length}}</view>
+      </scroll-view>
+    </view>
+  </t-popup>
 </view>

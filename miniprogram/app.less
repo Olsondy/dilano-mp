@@ -1,6 +1,18 @@
 /**app.wxss**/
 @import "styles/theme.less";
 
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: @text-main;
+  line-height: 1.5;
+  /* 解决部分安卓机字体过细 */
+  font-weight: 400; 
+}
+
 .container {
   height: 100%;
   display: flex;

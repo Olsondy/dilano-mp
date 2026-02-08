@@ -2,77 +2,114 @@
 
 .tab-bar {
   position: fixed;
-  bottom: 40rpx;
-  left: 40rpx;
-  right: 40rpx;
-  height: 120rpx;
-  background: white; // White background
-  border-radius: 60rpx;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100rpx;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
   display: flex;
-  align-items: center;
-  box-shadow: 0 10rpx 40rpx rgba(0, 0, 0, 0.05); // Lighter shadow
-  border: 1rpx solid @border-color;
-  backdrop-filter: blur(10px);
+  padding-bottom: env(safe-area-inset-bottom);
   z-index: 1000;
-  overflow: hidden;
-
-  // 共享的背景滑块
-  .active-bg {
+  
+  .tab-bar-border {
     position: absolute;
     top: 0;
-    height: 100%;
-    z-index: 0;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: left;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    .active-bg-inner {
-      width: 85%;
-      height: 90rpx;
-      background: @tab-active-bg; 
-      border-radius: 45rpx;
-    }
+    left: 0;
+    width: 100%;
+    height: 1rpx;
+    background: rgba(0,0,0,0.1);
+    transform: scaleY(0.5);
   }
 
   &-item {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     height: 100%;
-    position: relative;
-    .flex-center;
-    z-index: 2;
-
-    .item-content {
-      .flex-center;
-      transition: all 0.3s ease;
-      
-      .tab-icon {
-        width: 44rpx;
-        height: 44rpx;
-        opacity: 0.8;
-      }
-
-      .tab-text {
-        font-size: 26rpx;
-        margin-left: 12rpx;
-        font-weight: 600;
-        color: @tab-inactive-color;
-        transition: color 0.3s ease;
-
-        &.text-active {
-          color: @tab-active-color;
-          opacity: 1;
-        }
-      }
+    
+    // Animation for touch
+    transition: opacity 0.2s;
+    &:active {
+        opacity: 0.7;
+        .tab-icon-wrapper { transform: scale(0.9); }
     }
 
-    &.item-active {
-      .item-content {
-        .tab-icon {
-          opacity: 1;
+    .tab-icon-wrapper {
+        width: 48rpx;
+        height: 48rpx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 4rpx;
+        transition: transform 0.2s;
+        
+        // CSS Icons - Stabilized for Real Devices
+        .icon-shape {
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            // Home Icon (Grid style)
+            &.home {
+                width: 28rpx;
+                height: 28rpx;
+                border: 2rpx solid #999;
+                border-radius: 4rpx;
+                
+                &::before {
+                   content: ''; position: absolute; top: -2rpx; left: -2rpx;
+                   width: 12rpx; height: 12rpx; background: transparent; border-right: 2rpx solid #999; border-bottom: 2rpx solid #999;
+                }
+            }
+            
+            // User Icon -> Concentric Circles (Extremely stable)
+            &.user {
+                width: 28rpx;
+                height: 28rpx;
+                border: 2rpx solid #999;
+                border-radius: 50%;
+                
+                &::after {
+                    content: '';
+                    width: 10rpx;
+                    height: 10rpx;
+                    background: #999;
+                    border-radius: 50%;
+                }
+            }
         }
-      }
+    }
+
+    .tab-text {
+      font-size: 20rpx;
+      color: #999;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    // Active State
+    &.item-active {
+        .icon-shape {
+            &.home {
+                // All 4 dots turn black
+                filter: brightness(0);
+            }
+            
+            &.user {
+                border-color: #000;
+                &::after { background: #000; }
+            }
+        }
+        
+        .tab-text {
+            color: #000;
+            font-weight: 600;
+        }
     }
   }
 }

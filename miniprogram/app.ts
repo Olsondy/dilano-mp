@@ -1,4 +1,7 @@
 // app.ts
+import { AuthService } from './utils/auth';
+import { HeartbeatService } from './utils/heartbeat';
+
 App<IAppOption>({
   globalData: {},
   onLaunch() {
@@ -7,12 +10,16 @@ App<IAppOption>({
     logs.unshift(Date.now())
     wx.setStorageSync('logs', logs)
 
-    // 登录
-    wx.login({
-      success: res => {
-        console.log(res.code)
-        // 发送 res.code 到后台换取 openId, sessionKey, unionId
-      },
-    })
+    // Check session on launch
+    // If 401, the request interceptor will handle the redirection to mine page
+    AuthService.getUserInfo().catch(err => {
+      console.log('Session check failed or user not logged in:', err);
+    });
   },
+  onShow() {
+    HeartbeatService.start();
+  },
+  onHide() {
+    HeartbeatService.stop();
+  }
 })

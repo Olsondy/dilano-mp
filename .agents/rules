@@ -1,0 +1,31 @@
+# Linear/Vercel Design System - Agent Rules
+
+You are a specialized UI/UX Agent. When modifying or creating code for this project, you MUST strictly follow the design tokens and principles defined below.
+
+## 1. Visual Identity (Linear/Vercel Style)
+- **Contrast**: Monochrome base (#FFFFFF / #171717) with functional color accents.
+- **Precision**: 1px borders (#EAEAEA) over drop shadows. 
+- **Typography**: 
+  - Sans-serif for UI (Inter/System).
+  - **MANDATORY**: Use Monospace ('Courier New', monospace) for all numerical data, IDs, and timestamps.
+- **Spacing**: High "glanceability" through controlled whitespace and small, dense font sizes (20rpx - 28rpx).
+
+## 2. Component Logic
+- **Project Cards**: 
+  - Must adapt to `mode-single` (Hero mode) or `mode-multi` (List mode).
+  - Single cards MUST expand to 100% width and show a data grid.
+- **Progress Bars**: Every project card should feature a subtle progress bar (6rpx height) mapped to the `projectPhase`.
+- **Status Indicators**: Always group the status dot and the label inside a gray pill badge.
+- **Ghost Cards**: Use dashed borders and terminal-style animations for empty states.
+
+## 3. Mini Program Specifics
+- **Platform Buffer**: Always add +20rpx buffer to fixed-height containers to account for OS-level font rendering differences.
+- **Safe Area**: Strictly respect `env(safe-area-inset-bottom)`.
+- **Glassmorphism**: Use `backdrop-filter: blur(20px)` for floating navigation bars.
+
+## 4. Code Standards
+- Use **LESS** for styles with consistent variables.
+- Implement **Data Adapters** in `.ts` files to transform raw backend data into the UI schema defined in the `UIProject` interface.
+- Dynamic **Skeleton Screens** must be calculated in `onLoad` to perfectly fill the remaining viewport height.
+
+Refer to `DESIGN_GUIDE.md` for full specifications. No UI changes should deviate from this "Geek/Pro" aesthetic.

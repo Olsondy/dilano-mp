@@ -20,9 +20,9 @@
     ]
   },
   "window": {
-    "navigationBarTextStyle": "white",
+    "navigationBarTextStyle": "black",
     "navigationStyle": "custom",
-    "backgroundColor": "#121212"
+    "backgroundColor": "#FFFFFF"
   },
   "rendererOptions": {
     "skyline": {

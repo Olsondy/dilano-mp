@@ -1,92 +1,118 @@
 <!--index.wxml-->
 <view class="page-container">
-  <navigation-bar title="首页" back="{{false}}" color="black" background="#FFF"></navigation-bar>
+  <navigation-bar title="{{text.dashboard}}" back="{{false}}" color="#000" background="#FFF"></navigation-bar>
+  
   <view wx:if="{{loading}}" class="skeleton-screen">
     <view class="sk-header"></view>
-    <view class="sk-body">
-      <view class="sk-title"></view>
-      <view class="sk-cards">
-        <view class="sk-card-item" wx:for="{{2}}" wx:key="index"></view>
-      </view>
-      <view class="sk-title" style="width: 40%;"></view>
-      <view class="sk-list" wx:for="{{3}}" wx:key="index">
-        <view class="sk-time"></view>
-        <view class="sk-content"></view>
-      </view>
+    <view class="sk-cards-row">
+       <view class="sk-card"></view>
+       <view class="sk-card"></view>
+    </view>
+    <view class="sk-list">
+       <view class="sk-line" wx:for="{{skeletonCount}}" wx:key="index"></view>
     </view>
   </view>
 
-  <view wx:else class="actual-content">
-    <view class="header-bg">
-      <view class="company-name">DILANO 石业</view>
-      <view class="announcement">📢 公告：</view>
+  <view wx:else class="content-wrapper">
+    <!-- Header -->
+    <view class="header-section">
+      <view class="header-title">{{text.overview}}</view>
+      <view class="header-subtitle">DILANO 2026</view>
     </view>
 
-    <view class="main-container">
-      <view class="section">
-        <view class="section-title">项目概览</view>
-        <swiper 
-          class="projects-carousel project-swiper" 
-          previous-margin="60rpx" 
-          next-margin="60rpx" 
-          bindchange="onSwiperChange"
-          current="{{currentSwiperIndex}}"
-        >
-          <swiper-item wx:for="{{projectsData}}" wx:key="id">
-            <view 
-              class="summary-card {{currentSwiperIndex === index ? 'active' : ''}}" 
-              style="--tag-color: {{item.tagColor}}"
-            >
-              <view class="card-tag">{{item.tagText}}</view>
-              <view class="status-row">
-                <text class="status-desc">{{item.statusDesc}}</text>
-                <text class="status-label">状态</text>
-              </view>
-              <view class="project-name">{{item.name}}</view>
-              <view class="divider-line"></view>
-              <view class="material-info">{{item.material}}</view>
-              <view class="create-time">创建于: {{item.time}}</view>
-            </view>
-          </swiper-item>
-        </swiper>
-      </view>
-
-      <view class="section detail-section">
-        <view class="section-title">项目详情</view>
+    <!-- 1. Normal State: Project List -->
+    <scroll-view 
+      wx:if="{{projectsData.length > 0}}"
+      scroll-x 
+      class="project-scroll {{projectsData.length === 1 ? 'mode-single' : ''}}" 
+      enable-flex 
+      show-scrollbar="{{false}}"
+    >
+      <view class="project-card {{activeId === item.id ? 'active' : ''}}" 
+            wx:for="{{projectsData}}" 
+            wx:key="id"
+            bindtap="onProjectSelect"
+            data-index="{{index}}">
         
-        <view class="schedule-header">
-          <view class="col-time">时间</view>
-          <view class="col-progress">进度</view>
-          <view class="col-icon">
-            <view class="col-icon-btn" bindtap="toggleSort">
-              <view class="sort-arrow {{isDescending ? '' : 'ascending'}}"></view>
-            </view>
+        <view class="card-top">
+          <view class="status-indicator">
+            <view class="status-dot" style="background: {{item.tagColor}}"></view>
+            <view class="status-badge">{{item.statusDesc}}</view>
           </view>
         </view>
+
+        <view class="card-main">
+            <view class="project-name">{{item.name}}</view>
+            <view class="project-material">{{item.material}}</view>
+        </view>
         
-        <view class="timeline-container {{switchAnimation ? 'animate-switch' : ''}}">
-          <view 
-            wx:for="{{displayTimeline}}" 
-            wx:key="ts" 
-            class="timeline-row"
-            style="animation-delay: {{index * 0.08}}s;"
-          >
-            <view class="time-cell">
-              <view class="time-val">{{item.t}}</view>
-              <view class="date-val">{{item.d}}</view>
+        <view class="card-stats-grid">
+            <view class="stat-col">
+                <text class="label">{{text.created}}</text>
+                <text class="val">{{item.createDate}}</text>
             </view>
-            <view class="progress-cell">
-              <view class="detail-card">
-                <view class="detail-header" style="background:{{activeThemeColor}}">
-                  <text class="detail-title">{{item.title}}</text>
-                  <text class="detail-status">{{item.status}}</text>
+        </view>
+
+        <view class="card-bottom">
+            <view class="progress-section">
+                <view class="progress-label">
+                    <text>{{text.progress}}</text>
+                    <text>{{item.progress}}%</text>
                 </view>
-                <view class="detail-body">{{item.info}}</view>
-              </view>
+                <view class="progress-bar-bg">
+                    <view class="progress-bar-fill" style="width: {{item.progress}}%; background: {{item.tagColor}}"></view>
+                </view>
             </view>
-          </view>
         </view>
       </view>
+    </scroll-view>
+
+    <!-- 2. Empty State: The "Ghost" Card -->
+    <view wx:else class="empty-card-container">
+        <view class="ghost-card" bindtap="onPullDownRefresh">
+            <view class="ghost-icon">
+                <view class="g-circle"></view>
+                <view class="g-pulse"></view>
+            </view>
+            <view class="ghost-text">{{text.noProjects}}</view>
+            <view class="ghost-sub">
+                <text>{{text.statusIdle}}</text>
+                <text class="blink">_</text>
+            </view>
+        </view>
     </view>
+
+    <!-- Activity Section -->
+    <block wx:if="{{projectsData.length > 0}}">
+        <view class="section-header">
+        <text class="title">{{text.activity}}</text>
+        <view class="sort-btn" bindtap="toggleSort">
+            <text>{{text.sort}}</text>
+            <view class="icon-sort {{isDescending ? 'desc' : 'asc'}}"></view>
+        </view>
+        </view>
+
+        <view class="timeline-box {{switchAnimation ? 'animate-switch' : ''}}">
+        <view class="timeline-line"></view>
+        
+        <view wx:for="{{displayTimeline}}" wx:key="ts" class="timeline-item" style="animation-delay: {{index * 0.05}}s;">
+            <view class="timeline-node {{item.status === '进行中' ? 'pulse' : ''}}">
+            <view class="dot"></view>
+            </view>
+            
+            <view class="timeline-content">
+            <view class="row-top">
+                <text class="item-title">{{item.title}}</text>
+                <text class="item-time">{{item.d}} {{item.t}}</text>
+            </view>
+            <view class="item-desc">{{item.info}}</view>
+            </view>
+        </view>
+        
+        <view wx:if="{{displayTimeline.length === 0}}" class="empty-state">
+            <text>{{text.noActivity}}</text>
+        </view>
+        </view>
+    </block>
   </view>
 </view>

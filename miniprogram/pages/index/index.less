@@ -1,120 +1,436 @@
 @import "../../styles/theme.less";
 
-// 动画
-@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-@keyframes fadeInUp { from { opacity: 0; transform: translate3d(0, 40rpx, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
-@keyframes slideUp { from { opacity: 0; transform: translateY(20rpx); } to { opacity: 1; transform: translateY(0); } }
+// Linear / Vercel Color Palette & Variables
+@bg-base: #FFFFFF;
+@bg-hover: #FAFAFA;
+@bg-card: #FFFFFF;
+@text-primary: #171717;
+@text-secondary: #666666;
+@text-tertiary: #A1A1AA;
+@border-light: #EAEAEA;
+@border-active: #000000;
+@accent-purple: #5E6AD2; // Linear Purple
+@accent-blue: #0070F3;   // Vercel Blue
 
-.page-container { min-height: 100vh; background-color: @bg-color; color: @text-main; }
+// Animations
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10rpx); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulseRing { 0% { box-shadow: 0 0 0 0 rgba(94, 106, 210, 0.4); } 70% { box-shadow: 0 0 0 10rpx rgba(94, 106, 210, 0); } 100% { box-shadow: 0 0 0 0 rgba(94, 106, 210, 0); } }
 
-// 骨架屏样式
+.page-container {
+  background: @bg-base;
+  height: 100vh; // Force full viewport height
+  padding-bottom: 60rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+// Skeleton (Simple version)
 .skeleton-screen {
-  background: @bg-color; min-height: 100vh;
-  .sk-block { background: linear-gradient(90deg, @bg-color-2 25%, @bg-color-3 50%, @bg-color-2 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12rpx; }
-  .sk-header { height: 320rpx; background: @bg-color-2; opacity: 0.6; }
-  .sk-body { 
-    background: @bg-color; border-radius: 60rpx 60rpx 0 0; margin-top: -60rpx; padding: 48rpx 32rpx;
-    .sk-title { .sk-block; height: 40rpx; width: 30%; margin: 30rpx 0; }
-    .sk-cards { display: flex; .sk-card-item { .sk-block; width: 600rpx; height: 340rpx; margin-right: 20rpx; flex-shrink: 0; border-radius: 40rpx; } }
-    .sk-list { display: flex; margin-top: 40rpx; .sk-time { .sk-block; width: 120rpx; height: 80rpx; } .sk-content { .sk-block; flex: 1; height: 180rpx; margin-left: 40rpx; border-radius: 30rpx; } }
+    flex: 1;
+    width: 100%;
+    padding: 24rpx 32rpx;
+    box-sizing: border-box; // Ensure padding doesn't affect width
+    background: @bg-base; // Ensure background is white
+    
+    .sk-header { height: 60rpx; width: 40%; background: @bg-hover; margin-bottom: 40rpx; border-radius: 8rpx; }
+    .sk-cards-row { display: flex; gap: 24rpx; overflow: hidden; margin-bottom: 60rpx; }
+    .sk-card { width: 400rpx; height: 220rpx; background: @bg-hover; border-radius: 16rpx; flex-shrink: 0; }
+    .sk-list { .sk-line { height: 120rpx; margin-bottom: 24rpx; background: @bg-hover; border-radius: 8rpx; } }
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 24rpx 32rpx;
+}
+
+// Header
+.header-section {
+  margin-bottom: 40rpx;
+  padding-top: 20rpx;
+  .header-title { 
+      font-size: 56rpx; 
+      font-weight: 800; 
+      color: @text-primary; 
+      letter-spacing: -1.5rpx; 
+      line-height: 1.1;
+  }
+  .header-subtitle { 
+      font-size: 28rpx; 
+      color: @text-tertiary; 
+      margin-top: 8rpx; 
+      font-weight: 500; 
+      letter-spacing: 0.5rpx;
   }
 }
 
-// 正式内容样式
-.header-bg { 
-  height: 320rpx; 
-  padding: 80rpx 48rpx 0; 
-  color: @bg-color-2; 
-  background: linear-gradient(135deg, @brand-dark 0%, #0b7c85 45%, #82f5ef 100%);
-  overflow: hidden;  
+// Project Scroll (Horizontal List)
+.project-scroll {
+  display: flex;
+  height: 320rpx; // Increased height for real devices
+  margin-bottom: 40rpx;
+  width: 100%;
+  white-space: nowrap; // Important for scroll-x
+  
+  // Hero Mode (Single Project)
+  &.mode-single {
+      height: 380rpx; // Taller for Hero presence
+      .project-card {
+          width: 100%;
+          margin-right: 0;
+          height: 340rpx; // Increased height
+          
+          .project-name { font-size: 40rpx; } 
+          
+          .card-stats-grid { display: flex; } 
+      }
+  }
 
-  .company-name { 
-    font-size: 56rpx; // Larger title
-    font-weight: 800; 
-    position: relative; 
-    z-index: 1; 
-    color: @text-default;
-  } 
-  .announcement { 
-    font-size: 32rpx; 
-    opacity: 0.8; 
-    margin-top: 12rpx; 
-    position: relative; 
-    z-index: 1; 
-    color: @text-default;
-    font-weight: 600;
-  } 
+  .project-card {
+    display: inline-flex; // For scroll-view
+    vertical-align: top;
+    flex-direction: column;
+    justify-content: space-between;
+    
+    width: 520rpx; // Slightly wider for grid
+    height: 280rpx; // Increased height to prevent layout squash
+    margin-right: 24rpx;
+    padding: 24rpx;
+    box-sizing: border-box;
+    
+    border: 1rpx solid @border-light;
+    border-radius: 20rpx;
+    background: @bg-card;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+    &.active {
+      border-color: @text-primary; // Black border when active
+      box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
+      background: #FAFAFA;
+    }
+
+    &:active {
+        transform: scale(0.98);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: flex-end; 
+      align-items: center;
+      width: 100%;
+      
+      .status-indicator {
+          display: flex;
+          align-items: center;
+          background: #F3F4F6; 
+          padding: 4rpx 16rpx 4rpx 12rpx;
+          border-radius: 999rpx;
+
+          .status-dot {
+              width: 10rpx;
+              height: 10rpx;
+              border-radius: 50%;
+              margin-right: 10rpx;
+              box-shadow: 0 0 0 1rpx rgba(0,0,0,0.05);
+          }
+
+          .status-badge { 
+            font-size: 20rpx; 
+            color: @text-secondary; 
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5rpx;
+          }
+      }
+    }
+
+    .card-main {
+        margin-top: 12rpx;
+        flex: 1;
+
+        .project-name { 
+            font-size: 30rpx; 
+            font-weight: 700; 
+            color: @text-primary; 
+            white-space: normal;
+            line-height: 1.3;
+        }
+
+        .project-material { 
+            font-size: 24rpx; 
+            color: @text-secondary; 
+            margin-top: 4rpx;
+            overflow: hidden; 
+            white-space: nowrap; 
+            text-overflow: ellipsis; 
+        }
+    }
+    
+    // Stats Grid - Visible mainly in Hero or wider cards
+    .card-stats-grid {
+        display: flex; 
+        gap: 32rpx;
+        margin-bottom: 16rpx; // Reduced margin
+        
+        .stat-col {
+            display: flex;
+            flex-direction: column;
+            .label { font-size: 18rpx; color: @text-tertiary; font-weight: 600; margin-bottom: 4rpx; }
+            .val { 
+                font-family: 'Courier New', monospace; 
+                font-size: 22rpx; // Slightly smaller for dates
+                color: @text-primary; 
+                font-weight: 600; 
+                white-space: nowrap; // Prevent wrapping
+            }
+        }
+    }
+    
+    .card-bottom {
+        width: 100%;
+        margin-top: auto; 
+        margin-bottom: 4rpx; // Safety margin for real devices
+        
+        .progress-section {
+            width: 100%;
+            .progress-label {
+                display: flex;
+                justify-content: space-between;
+                font-size: 20rpx;
+                color: @text-secondary;
+                margin-bottom: 8rpx;
+                font-weight: 500;
+            }
+            .progress-bar-bg {
+                width: 100%;
+                height: 6rpx;
+                background: @border-light;
+                border-radius: 6rpx;
+                overflow: hidden;
+                
+                .progress-bar-fill {
+                    height: 100%;
+                    border-radius: 6rpx;
+                    transition: width 0.5s ease;
+                }
+            }
+        }
+    }
+  }
 }
-.main-container { background: @bg-color; border-radius: 60rpx 60rpx 0 0; margin-top: -60rpx; padding: 40rpx 30rpx; min-height: calc(100vh - 260rpx)}  
 
-.section-title { font-size: 36rpx; font-weight: 700; margin-bottom: 30rpx; padding-left: 10rpx; color: @text-main; }
+// Empty State: Ghost Card
+.empty-card-container {
+    width: 100%;
+    height: 320rpx; // Match standard card height
+    margin-bottom: 60rpx;
+    display: flex;
+    justify-content: center;
 
-// Subjects 卡片
-.project-swiper {
-  height: 400rpx;
-  swiper-item {
+    .ghost-card {
+        width: 100%;
+        height: 100%;
+        border: 2rpx dashed @border-light;
+        border-radius: 24rpx;
+        background: @bg-hover;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s;
+
+        &:active {
+            background: #F3F4F6;
+            border-color: @text-tertiary;
+        }
+
+        .ghost-icon {
+            position: relative;
+            width: 48rpx;
+            height: 48rpx;
+            margin-bottom: 24rpx;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .g-circle {
+                width: 100%;
+                height: 100%;
+                border: 2rpx solid @text-tertiary;
+                border-radius: 50%;
+                opacity: 0.5;
+            }
+            
+            .g-pulse {
+                position: absolute;
+                width: 8rpx;
+                height: 8rpx;
+                background: @text-tertiary;
+                border-radius: 50%;
+                animation: pulseGhost 2s infinite;
+            }
+        }
+
+        .ghost-text {
+            font-size: 24rpx;
+            font-weight: 700;
+            color: @text-secondary;
+            letter-spacing: 2rpx;
+            margin-bottom: 8rpx;
+        }
+
+        .ghost-sub {
+            font-family: 'Courier New', monospace;
+            font-size: 20rpx;
+            color: @text-tertiary;
+            
+            .blink {
+                animation: blinkCursor 1s infinite;
+            }
+        }
+    }
+}
+
+@keyframes pulseGhost { 
+    0% { transform: scale(1); opacity: 1; } 
+    50% { transform: scale(1.5); opacity: 0.5; } 
+    100% { transform: scale(1); opacity: 1; } 
+}
+
+@keyframes blinkCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+// Section Header
+.section-header {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: flex-end; 
+  margin-bottom: 32rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid @bg-hover;
+
+  .title { font-size: 32rpx; font-weight: 700; color: @text-primary; letter-spacing: -0.5rpx; }
+  .sort-btn { 
+      font-size: 24rpx; 
+      color: @text-secondary; 
+      display: flex; 
+      align-items: center; 
+      gap: 8rpx; 
+      padding: 8rpx 16rpx;
+      background: @bg-hover;
+      border-radius: 8rpx;
+      
+      &:active { opacity: 0.7; }
+
+      .icon-sort {
+          width: 0; height: 0; 
+          border-left: 8rpx solid transparent; 
+          border-right: 8rpx solid transparent; 
+          transition: transform 0.3s;
+          
+          &.desc { border-top: 10rpx solid @text-primary; }
+          &.asc { border-top: 10rpx solid @text-primary; transform: rotate(180deg); }
+      }
+  }
+}
+
+// Timeline (Linear Style)
+.timeline-box {
+  position: relative;
+  padding-left: 24rpx; // Space for left node
+  min-height: 400rpx;
+  transition: opacity 0.3s ease;
+  
+  &.animate-switch {
+      opacity: 0.5;
+  }
+}
+
+.timeline-line {
+  position: absolute;
+  left: 31rpx; // Center align with dots
+  top: 16rpx;
+  bottom: 40rpx;
+  width: 2rpx;
+  background: @border-light;
+  z-index: 0;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 48rpx;
+  padding-left: 48rpx; // Content padding
+  z-index: 1;
+  opacity: 0;
+  animation: fadeIn 0.4s ease forwards;
+
+  // Visual Node
+  .timeline-node {
+    position: absolute;
+    left: 0;
+    top: 10rpx; // Align with title baseline
+    width: 16rpx;
+    height: 16rpx;
+    background: @bg-base; // Mask line
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2;
+    
+    .dot {
+      width: 12rpx;
+      height: 12rpx;
+      border-radius: 50%;
+      background: #D4D4D8; // Default grey
+      border: 2rpx solid @bg-base; // Mask
+      transition: background 0.3s;
+    }
+
+    // Active Status Pulse
+    &.pulse {
+       .dot {
+          background: @accent-purple;
+       }
+       &::after {
+           content: '';
+           position: absolute;
+           top: -8rpx; left: -8rpx; right: -8rpx; bottom: -8rpx;
+           border-radius: 50%;
+           animation: pulseRing 2s infinite;
+       }
+    }
   }
 
-  .summary-card {
-    display: block; 
-    width: 100%; 
-    height: 340rpx; 
-    box-sizing: border-box; 
-    background: @bg-color-2; // Teal background for card
-    border-radius: 40rpx; 
-    overflow: hidden;
-    padding: 30rpx; 
-    position: relative; 
-    box-shadow: 0 10rpx 20rpx rgba(77, 182, 172, 0.2); 
-    transition: all 0.3s ease;
-    transform: scale(0.9); 
-    opacity: 0.8;
-    color: white;
-
-    &.active { 
-      transform: scale(1); 
-      opacity: 1;
-      z-index: 10;
-      box-shadow: 0 10rpx 10rpx rgba(77, 182, 172, 0.4); 
-      border: 4rpx solid @brand-color; // Highlight active card
+  .timeline-content {
+    .row-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8rpx;
+      
+      .item-title { 
+          font-size: 28rpx; 
+          font-weight: 600; 
+          color: @text-primary; 
+      }
+      .item-time { 
+          font-family: 'Courier New', monospace; 
+          font-size: 22rpx; 
+          color: @text-tertiary; 
+          letter-spacing: -0.5rpx;
+      }
     }
     
-    .card-tag { position: absolute; top: 0; right: 0; padding: 8rpx 24rpx; font-size: 22rpx; font-weight: 700; color: white; border-bottom-left-radius: 24rpx; background: var(--tag-color); }
-    .status-row { display: flex; align-items: baseline; .status-desc { font-size: 40rpx; font-weight: 800; color: @text-main; } .status-label { font-size: 22rpx; color: @text-sub; margin-left: 10rpx; } } 
-    .project-name { font-size: 32rpx; font-weight: 600; color: @brand-color; margin-top: 20rpx; } 
-    .divider-line { height: 2rpx; background: @border-color; margin: 24rpx 0; } 
-    .material-info { font-size: 26rpx; white-space: normal; color: @text-sub; } 
-    .create-time { font-size: 18rpx; color: @text-grey; margin-top: 10rpx; } 
+    .item-desc {
+      font-size: 26rpx;
+      color: @text-secondary;
+      line-height: 1.6;
+    }
   }
 }
 
-// Schedule 详情
-.schedule-header {
-  display: flex; align-items: center; padding: 20rpx 0; color: @text-sub; font-size: 26rpx; font-weight: 600;
-  .col-time { width: 180rpx; text-align: center; }
-  .col-progress { flex: 1; padding-left: 40rpx; }
-  .col-icon { width: 80rpx; display: flex; justify-content: flex-end; }
+.empty-state {
+    padding: 60rpx 0;
+    text-align: center;
+    color: @text-tertiary;
+    font-size: 28rpx;
 }
-
-.col-icon-btn { width: 64rpx; height: 64rpx; display: flex; align-items: center; justify-content: center; border-radius: 50%; &:active { background: rgba(255,255,255,0.1); transform: scale(0.8); } } 
-
-.sort-arrow {
-  width: 0; height: 0; border-left: 12rpx solid transparent; border-right: 12rpx solid transparent; border-top: 16rpx solid @text-grey; transition: transform 0.5s cubic-bezier(0.5, 0, 0.2, 1.2);
-  &.ascending { transform: rotate(180deg); border-top-color: @brand-color; }
-}
-
-.timeline-container {
-  position: relative;
-  &::before { content: ''; position: absolute; left: 180rpx; top: 0; bottom: 40rpx; width: 2rpx; background-color: @border-color; }
-}
-
-.timeline-row { 
-  display: flex; margin-bottom: 40rpx; opacity: 0; animation: slideUp 0.4s ease forwards;
-  .time-cell { width: 180rpx; text-align: center; padding-top: 10rpx; flex-shrink: 0; .time-val { font-size: 32rpx; font-weight: 700; color: @text-main; } .date-val { font-size: 22rpx; color: @text-grey; } }
-  .progress-cell { flex: 1; padding-left: 40rpx; .detail-card { background: @bg-color-2; border-radius: 30rpx; box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05); overflow: hidden; .detail-header { padding: 20rpx 30rpx; color: white; display: flex; justify-content: space-between; .detail-title { font-weight: 700; font-size: 28rpx; } .detail-status { font-size: 22rpx; } } .detail-body { padding: 24rpx 30rpx; background: @bg-color-2; font-size: 26rpx; line-height: 1.5; color: @text-sub; } } }
-}
-
-.animate-fadeInUp { animation: fadeInUp 0.6s ease both; }
