@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "DILANO",
+  "navigationBarBackgroundColor": "#FFFFFF",
+  "navigationBarTextStyle": "black",
   "usingComponents": {}
 }

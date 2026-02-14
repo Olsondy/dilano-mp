@@ -277,7 +277,7 @@ Page({
           tagColor: color,
           themeColor: color,
           material: materialStr,
-          createDate: item.createTime ? item.createTime.split(' ')[0] : '', // 提取 YYYY-MM-DD
+          createDate: item.createTime ? item.createTime.substring(0, 16) : '', // 保留 YYYY-MM-DD HH:mm
           commission: commissionVal,
           progress: progressMap[item.projectPhase] || 0,
           timeline: timeline,

@@ -19,7 +19,7 @@
 .page-container {
   background: @bg-base;
   height: 100vh; // Force full viewport height
-  padding-bottom: 60rpx;
+  padding-bottom: 240rpx; // Increased padding for Floating TabBar
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -91,6 +91,7 @@
     vertical-align: top;
     flex-direction: column;
     justify-content: space-between;
+    position: relative; // Crucial for pseudo-element positioning
     
     width: 520rpx; // Slightly wider for grid
     height: 280rpx; // Increased height to prevent layout squash
@@ -98,15 +99,31 @@
     padding: 24rpx;
     box-sizing: border-box;
     
-    border: 1rpx solid @border-light;
     border-radius: 20rpx;
     background: @bg-card;
     transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
 
+    // High-quality Smooth Border using pseudo-element
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-radius: 20rpx;
+        border: 1px solid #E5E7EB; // Sharp unselected border
+        pointer-events: none; // Ensure clicks pass through to the card
+        transition: all 0.2s;
+        z-index: 1;
+    }
+
     &.active {
-      border-color: @text-primary; // Black border when active
-      box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.05);
       background: #FAFAFA;
+      &::after {
+          border: 2rpx solid @text-primary; // Refined thickness
+          box-shadow: inset 0 0 0 0.5px @text-primary; // Subtle anti-aliasing helper
+      }
     }
 
     &:active {
