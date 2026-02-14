@@ -115,10 +115,30 @@
 
     .card-top {
       display: flex;
-      justify-content: flex-end; 
+      justify-content: space-between; 
       align-items: center;
       width: 100%;
       
+      .source-badge {
+          font-size: 18rpx;
+          font-weight: 700;
+          padding: 4rpx 12rpx;
+          border-radius: 4rpx;
+          letter-spacing: 0.5rpx;
+          text-transform: uppercase;
+
+          &.source-self {
+              background: @text-primary;
+              color: #FFF;
+          }
+
+          &.source-referred {
+              background: @bg-hover;
+              color: @text-secondary;
+              border: 1rpx solid @border-light;
+          }
+      }
+
       .status-indicator {
           display: flex;
           align-items: center;
@@ -212,6 +232,8 @@
                     height: 100%;
                     border-radius: 6rpx;
                     transition: width 0.5s ease;
+                    width: var(--progress);
+                    background-color: var(--tag-color);
                 }
             }
         }

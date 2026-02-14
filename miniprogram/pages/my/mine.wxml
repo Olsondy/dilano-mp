@@ -28,24 +28,20 @@
         <text class="stat-label">{{text.referrerLabel}}</text>
         <text class="stat-value">{{referrer}}</text>
       </view>
+      <view class="stat-card" bindtap="openReferrals" hover-class="item-active">
+        <text class="stat-label">{{text.referrals}}</text>
+        <text class="stat-value">{{referralList.length}}</text>
+      </view>
     </view>
 
     <!-- General Section -->
     <view class="menu-group">
         <view class="section-label">{{text.generalSection}}</view>
         <view class="menu-list">
-            <!-- Language Switcher (New) -->
             <view class="menu-item" hover-class="item-active" bindtap="toggleLanguage">
                 <text class="item-text">{{text.language}}</text>
                 <view class="item-right">
                     <text class="value-text">{{currentLang === 'en' ? 'English' : '中文'}}</text>
-                    <view class="arrow-right"></view>
-                </view>
-            </view>
-
-            <view class="menu-item" hover-class="item-active" bindtap="openReferrals">
-                <text class="item-text">{{text.referrals}}</text>
-                <view class="item-right">
                     <view class="arrow-right"></view>
                 </view>
             </view>
@@ -56,26 +52,71 @@
     <view class="menu-group">
         <view class="section-label">{{text.supportSection}}</view>
         <view class="menu-list">
+            <button class="menu-item-btn" open-type="contact">
+                <view class="menu-item">
+                    <text class="item-text">{{text.contact}}</text>
+                    <view class="item-right">
+                        <view class="arrow-right"></view>
+                    </view>
+                </view>
+            </button>
+            <button class="menu-item-btn" open-type="feedback">
+                <view class="menu-item">
+                    <text class="item-text">{{text.feedback}}</text>
+                    <view class="item-right">
+                        <view class="arrow-right"></view>
+                    </view>
+                </view>
+            </button>
+            <!-- <view class="menu-item" hover-class="item-active" bindtap="handleClearCache">
+                <text class="item-text">{{text.clearCache}}</text>
+                <view class="item-right">
+                    <text class="value-text">{{storageSize}}</text>
+                    <view class="arrow-right"></view>
+                </view>
+            </view> -->
+        </view>
+    </view>
+
+    <!-- Legal Section -->
+    <view class="menu-group">
+        <view class="section-label">{{text.legalSection}}</view>
+        <view class="menu-list">
+            <view class="menu-item" hover-class="item-active" bindtap="handleAgreement">
+                <text class="item-text">{{text.userAgreement}}</text>
+                <view class="item-right">
+                    <view class="arrow-right"></view>
+                </view>
+            </view>
             <view class="menu-item" hover-class="item-active" bindtap="handlePrivacy">
                 <text class="item-text">{{text.privacy}}</text>
                 <view class="item-right">
                     <view class="arrow-right"></view>
                 </view>
             </view>
-             <view class="menu-item" hover-class="item-active">
-                <text class="item-text">{{text.about}}</text>
+            <view class="menu-item" hover-class="item-active" bindtap="handleDeleteAccount">
+                <text class="item-text" style="color: #E5484D;">{{text.deleteAccount}}</text>
                 <view class="item-right">
                     <view class="arrow-right"></view>
                 </view>
             </view>
-             <view class="menu-item" hover-class="item-active" bindtap="handleLogout">
-                <text class="item-text" style="color: #E5484D;">{{text.logout}}</text>
+        </view>
+    </view>
+
+    <!-- About Section -->
+    <view class="menu-group">
+        <view class="menu-list">
+            <view class="menu-item">
+                <text class="item-text">{{text.about}}</text>
+                <view class="item-right">
+                    <text class="value-text">{{text.footer}}</text>
+                </view>
             </view>
         </view>
     </view>
 
-    <view class="footer-info">
-        <text>{{text.footer}}</text>
+    <view class="footer-action" bindtap="handleLogout">
+        <text class="logout-text">{{text.logout}}</text>
     </view>
   </view>
 
@@ -83,16 +124,12 @@
   <t-popup visible="{{showLogin}}" bind:visible-change="onVisibleChange" placement="bottom" close-on-overlay-click="{{false}}">
     <view class="login-popup-content">
       <view class="login-header">
-        <text class="login-title">身份验证</text>
-        <text class="login-desc">请授权手机号以访问您的账户信息</text>
+        <text class="login-title">{{text.loginTitle}}</text>
+        <text class="login-desc">{{text.loginDesc}}</text>
       </view>
 
-      <view class="privacy-row" bindtap="togglePrivacy">
-        <t-icon name="{{privacyAgreed ? 'check-circle-filled' : 'circle'}}" size="36rpx" color="{{privacyAgreed ? '#18181B' : '#999'}}" />
-        <view class="privacy-text">
-            <text>我已阅读并同意</text>
-            <text class="link" catchtap="handlePrivacy">《隐私协议》</text>
-        </view>
+      <view class="login-tip {{showAgreementError ? 'show' : ''}}">
+        <text>{{text.agreeErr}}{{text.userAgreement}}{{text.andText}}{{text.privacyLink}}</text>
       </view>
 
       <t-button 
@@ -103,10 +140,9 @@
         block 
         bind:tap="handleLoginCheck"
       >
-        手机号一键登录
+        {{text.loginBtn}}
       </t-button>
-
-      <t-button 
+      <t-button
         wx:else
         t-class="login-btn-black"
         theme="primary" 
@@ -115,8 +151,17 @@
         open-type="getPhoneNumber" 
         bind:getphonenumber="handleLogin"
       >
-        手机号一键登录
+        {{text.loginBtn}}
       </t-button>
+      <view class="privacy-row" bindtap="togglePrivacy">
+        <t-icon name="{{privacyAgreed ? 'check-circle-filled' : 'circle'}}" size="36rpx" color="{{privacyAgreed ? '#18181B' : '#999'}}" style="margin-top: 2rpx;" />
+        <view class="privacy-text">
+            <text>{{text.agreeText}}</text>
+            <text class="link" catchtap="handleAgreement">{{text.userAgreement}}</text>
+            <text>{{text.andText}}</text>
+            <text class="link" catchtap="handlePrivacy">{{text.privacyLink}}</text>
+        </view>
+      </view>
     </view>
   </t-popup>
 

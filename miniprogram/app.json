@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/webview/index",
     "custom-tab-bar/index",
     "pages/my/mine"
   ],

@@ -29,9 +29,23 @@ export const request = <T>(options: RequestOptions): Promise<T> => {
       header,
       success: (res: any) => {
         const isHttp401 = res.statusCode === 401;
-        const isBusiness401 = res.data && res.data.code === 401;
+        const code = res.data ? res.data.code : 0;
+        const isBusiness401 = code === 401;
+        const isUserNotExist = code === 90400 || code === 90500; // Handle specific user errors as auth errors
+        const isUserDisabled = code === 90600; // Account explicitly deleted/forbidden
 
-        if (isHttp401 || isBusiness401) {
+        if (isUserDisabled) {
+            wx.showModal({
+                title: '账号状态提示',
+                content: res.data.msg || '您的账号已注销或禁用，如需恢复请联系客服。',
+                showCancel: false,
+                confirmText: '确定'
+            });
+            reject({ code: 90600, message: 'Account Disabled' });
+            return;
+        }
+
+        if (isHttp401 || isBusiness401 || isUserNotExist) {
           // Token 过期或未登录
           wx.removeStorageSync(TOKEN_KEY);
           
@@ -53,12 +67,28 @@ export const request = <T>(options: RequestOptions): Promise<T> => {
              const page = getCurrentPages().pop();
              if (page) page.onShow();
           }
-          reject({ code: 401, message: 'Unauthorized' });
+          
+          // Show specific message for user errors if needed, or just standard Unauthorized
+          const msg = isUserNotExist ? (res.data.msg || '请重新登录') : 'Unauthorized';
+          reject({ code: code || 401, message: msg });
           return;
         }
 
         if (res.statusCode >= 200 && res.statusCode < 300) {
-          resolve(res.data);
+          // Check business code
+          const data = res.data as any;
+          if (data && data.code && data.code !== 200) {
+            // Business Error
+            wx.showToast({
+              title: data.msg || '请求失败',
+              icon: 'none',
+              duration: 2000
+            });
+            reject(data);
+          } else {
+            // Success
+            resolve(res.data);
+          }
         } else {
           reject(res.data || { message: 'Network Error' });
         }

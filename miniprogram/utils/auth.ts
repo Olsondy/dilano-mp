@@ -43,7 +43,7 @@ export class AuthService {
     try {
       const loginCode = await this.getLoginCode();
       const res: any = await request({
-        url: '/app/v1/auth/wx-login',
+        url: '/app/v1/auth/one-click-login',
         method: 'POST',
         data: {
           loginCode,
@@ -99,6 +99,20 @@ export class AuthService {
       });
     } catch (e) {
       console.error('Logout API failed:', e);
+    } finally {
+      this.removeToken();
+    }
+  }
+
+  static async deleteAccount(): Promise<any> {
+    try {
+      const res = await request({
+        url: '/app/v1/user/cancellation',
+        method: 'POST'
+      });
+      return res;
+    } catch (e) {
+      throw e;
     } finally {
       this.removeToken();
     }
