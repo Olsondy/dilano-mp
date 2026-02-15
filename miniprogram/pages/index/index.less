@@ -9,8 +9,8 @@
 @text-tertiary: #A1A1AA;
 @border-light: #EAEAEA;
 @border-active: #000000;
-@accent-purple: #5E6AD2; // Linear Purple
-@accent-blue: #0070F3;   // Vercel Blue
+@accent-purple: #5E6AD2; 
+@accent-blue: #0070F3;   
 
 // Animations
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10rpx); } to { opacity: 1; transform: translateY(0); } }
@@ -18,21 +18,20 @@
 
 .page-container {
   background: @bg-base;
-  height: 100vh; // Force full viewport height
-  padding-bottom: 240rpx; // Increased padding for Floating TabBar
+  height: 100vh;
+  padding-bottom: 240rpx;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
 
-// Skeleton (Simple version)
+// Skeleton
 .skeleton-screen {
     flex: 1;
     width: 100%;
     padding: 24rpx 32rpx;
-    box-sizing: border-box; // Ensure padding doesn't affect width
-    background: @bg-base; // Ensure background is white
-    
+    box-sizing: border-box;
+    background: @bg-base;
     .sk-header { height: 60rpx; width: 40%; background: @bg-hover; margin-bottom: 40rpx; border-radius: 8rpx; }
     .sk-cards-row { display: flex; gap: 24rpx; overflow: hidden; margin-bottom: 60rpx; }
     .sk-card { width: 400rpx; height: 220rpx; background: @bg-hover; border-radius: 16rpx; flex-shrink: 0; }
@@ -48,68 +47,45 @@
 .header-section {
   margin-bottom: 40rpx;
   padding-top: 20rpx;
-  .header-title { 
-      font-size: 56rpx; 
-      font-weight: 800; 
-      color: @text-primary; 
-      letter-spacing: -1.5rpx; 
-      line-height: 1.1;
-  }
-  .header-subtitle { 
-      font-size: 28rpx; 
-      color: @text-tertiary; 
-      margin-top: 8rpx; 
-      font-weight: 500; 
-      letter-spacing: 0.5rpx;
-  }
+  .header-title { font-size: 56rpx; font-weight: 800; color: @text-primary; letter-spacing: -1.5rpx; line-height: 1.1; }
+  .header-subtitle { font-size: 28rpx; color: @text-tertiary; margin-top: 8rpx; font-weight: 500; letter-spacing: 0.5rpx; }
 }
 
-// Project Scroll (Horizontal List)
-.project-scroll {
-  display: flex;
-  height: 520rpx; // Further increased for very long content
+// Project Swiper (Hero Style)
+.project-swiper {
+  height: 420rpx; // Compact height
   margin-bottom: 40rpx;
   width: 100%;
-  white-space: nowrap; // Important for scroll-x
-  
-  // Hero Mode (Single Project)
-  &.mode-single {
-      height: 380rpx; // Taller for Hero presence
-      .project-card {
-          width: 100%;
-          margin-right: 0;
-          height: 340rpx; // Increased height
-          
-          .project-name { font-size: 40rpx; } 
-          
-          .card-stats-grid { display: flex; } 
-      }
+
+  .swiper-item {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      padding: 0 10rpx; // Forces a gap between cards
   }
 
   .project-card {
-    display: inline-flex; // For scroll-view
-    vertical-align: top;
+    display: flex;
     flex-direction: column;
     position: relative;
     
-    width: 620rpx; // Increased width for more content per line
-    min-height: 320rpx; // Switched to min-height
-    margin-right: 32rpx;
-    padding: 32rpx; // More generous padding
+    width: 560rpx; // Adjusted for 90rpx margins
+    height: 360rpx; 
+    padding: 32rpx;
     box-sizing: border-box;
     
-    border-radius: 24rpx;
+    border-radius: 32rpx;
     background: @bg-card;
-    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.9);
+    opacity: 0.5;
 
     &::after {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        border-radius: 24rpx;
+        top: 0; left: 0; right: 0; bottom: 0;
+        border-radius: 32rpx;
         border: 1px solid #E5E7EB;
         pointer-events: none;
         transition: all 0.2s;
@@ -117,154 +93,51 @@
     }
 
     &.active {
+      transform: scale(1);
+      opacity: 1;
       background: #FAFAFA;
-      &::after {
-          border: 2rpx solid @text-primary;
-          box-shadow: inset 0 0 0 0.5px @text-primary;
-      }
-    }
-
-    &:active {
-        transform: scale(0.98);
+      &::after { border: 2rpx solid @text-primary; box-shadow: inset 0 0 0 0.5px @text-primary; }
     }
 
     .card-top {
-      display: flex;
-      justify-content: space-between; 
-      align-items: center;
-      width: 100%;
-      margin-bottom: 24rpx;
-      
-      .source-badge {
-          font-size: 18rpx;
-          font-weight: 700;
-          padding: 4rpx 12rpx;
-          border-radius: 4rpx;
-          letter-spacing: 0.5rpx;
-          text-transform: uppercase;
-
-          &.source-self {
-              background: @text-primary;
-              color: #FFF;
-          }
-
-          &.source-referred {
-              background: @bg-hover;
-              color: @text-secondary;
-              border: 1rpx solid @border-light;
-          }
+      display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20rpx;
+      .source-badge { font-size: 16rpx; font-weight: 700; padding: 2rpx 10rpx; border-radius: 4rpx; letter-spacing: 0.5rpx; text-transform: uppercase;
+          &.source-self { background: @text-primary; color: #FFF; }
+          &.source-referred { background: @bg-hover; color: @text-secondary; border: 1rpx solid @border-light; }
       }
-
-      .status-indicator {
-          display: flex;
-          align-items: center;
-          background: #F3F4F6; 
-          padding: 4rpx 16rpx 4rpx 12rpx;
-          border-radius: 999rpx;
-
-          .status-dot {
-              width: 10rpx;
-              height: 10rpx;
-              border-radius: 50%;
-              margin-right: 10rpx;
-              box-shadow: 0 0 0 1rpx rgba(0,0,0,0.05);
-          }
-
-          .status-badge { 
-            font-size: 20rpx; 
-            color: @text-secondary; 
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5rpx;
-          }
+      .status-indicator { display: flex; align-items: center; background: #F3F4F6; padding: 2rpx 12rpx; border-radius: 999rpx;
+          .status-dot { width: 10rpx; height: 10rpx; border-radius: 50%; margin-right: 10rpx; }
+          .status-badge { font-size: 18rpx; color: @text-secondary; font-weight: 600; text-transform: uppercase; }
       }
     }
 
     .card-main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-
+        flex: 1; display: flex; flex-direction: column; justify-content: flex-start;
         .project-name { 
-            font-size: 34rpx; 
-            font-weight: 800; 
-            color: @text-primary; 
-            white-space: normal; 
-            word-break: break-all;
-            line-height: 1.4;
-            margin-bottom: 12rpx;
-            display: block; // Changed from -webkit-box to allow infinite lines
+            font-size: 34rpx; font-weight: 800; color: @text-primary; white-space: normal; word-break: break-all; line-height: 1.2; margin-bottom: 4rpx;
+            display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
         }
-
         .project-material { 
-            font-size: 24rpx; 
-            color: @text-secondary; 
-            white-space: normal; 
-            word-break: break-all;
-            line-height: 1.6;
-            opacity: 0.9;
-            display: block; // Allow all lines to show
-            
-            // Add a subtle top border or spacing to separate from title
-            padding-top: 8rpx;
+            font-size: 24rpx; color: @text-secondary; white-space: normal; word-break: break-all; line-height: 1.4; opacity: 0.8;
+            display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden;
         }
     }
     
-    .card-bottom {
-        margin-top: 32rpx;
-        width: 100%;
-    }
-    
-    // Stats Grid - Visible mainly in Hero or wider cards
     .card-stats-grid {
-        display: flex; 
-        gap: 32rpx;
-        margin-bottom: 16rpx; // Reduced margin
-        
+        display: flex; gap: 24rpx; margin-top: 12rpx; margin-bottom: 12rpx;
         .stat-col {
-            display: flex;
-            flex-direction: column;
-            .label { font-size: 18rpx; color: @text-tertiary; font-weight: 600; margin-bottom: 4rpx; }
-            .val { 
-                font-family: 'Courier New', monospace; 
-                font-size: 22rpx; // Slightly smaller for dates
-                color: @text-primary; 
-                font-weight: 600; 
-                white-space: nowrap; // Prevent wrapping
-            }
+            display: flex; flex-direction: column;
+            .label { font-size: 16rpx; color: @text-tertiary; font-weight: 600; margin-bottom: 2rpx; text-transform: uppercase; }
+            .val { font-family: 'Courier New', monospace; font-size: 20rpx; color: @text-primary; font-weight: 600; }
         }
     }
     
     .card-bottom {
-        width: 100%;
-        margin-top: auto; 
-        margin-bottom: 4rpx; // Safety margin for real devices
-        
+        margin-top: auto; width: 100%;
         .progress-section {
-            width: 100%;
-            .progress-label {
-                display: flex;
-                justify-content: space-between;
-                font-size: 20rpx;
-                color: @text-secondary;
-                margin-bottom: 8rpx;
-                font-weight: 500;
-            }
-            .progress-bar-bg {
-                width: 100%;
-                height: 6rpx;
-                background: @border-light;
-                border-radius: 6rpx;
-                overflow: hidden;
-                
-                .progress-bar-fill {
-                    height: 100%;
-                    border-radius: 6rpx;
-                    transition: width 0.5s ease;
-                    width: var(--progress);
-                    background-color: var(--tag-color);
-                }
+            .progress-label { display: flex; justify-content: space-between; font-size: 18rpx; color: @text-secondary; margin-bottom: 4rpx; font-weight: 500; }
+            .progress-bar-bg { width: 100%; height: 4rpx; background: @border-light; border-radius: 4rpx; overflow: hidden;
+                .progress-bar-fill { height: 100%; border-radius: 4rpx; transition: width 0.5s ease; width: var(--progress); background-color: var(--tag-color); }
             }
         }
     }
@@ -273,216 +146,49 @@
 
 // Empty State: Ghost Card
 .empty-card-container {
-    width: 100%;
-    height: 320rpx; // Match standard card height
-    margin-bottom: 60rpx;
-    display: flex;
-    justify-content: center;
-
+    width: 100%; height: 320rpx; margin-bottom: 60rpx; display: flex; justify-content: center;
     .ghost-card {
-        width: 100%;
-        height: 100%;
-        border: 2rpx dashed @border-light;
-        border-radius: 24rpx;
-        background: @bg-hover;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        transition: all 0.3s;
-
-        &:active {
-            background: #F3F4F6;
-            border-color: @text-tertiary;
+        width: 100%; height: 100%; border: 2rpx dashed @border-light; border-radius: 24rpx; background: @bg-hover;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        .ghost-icon { position: relative; width: 48rpx; height: 48rpx; margin-bottom: 24rpx; display: flex; justify-content: center; align-items: center;
+            .g-circle { width: 100%; height: 100%; border: 2rpx solid @text-tertiary; border-radius: 50%; opacity: 0.5; }
+            .g-pulse { position: absolute; width: 8rpx; height: 8rpx; background: @text-tertiary; border-radius: 50%; animation: pulseGhost 2s infinite; }
         }
-
-        .ghost-icon {
-            position: relative;
-            width: 48rpx;
-            height: 48rpx;
-            margin-bottom: 24rpx;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            .g-circle {
-                width: 100%;
-                height: 100%;
-                border: 2rpx solid @text-tertiary;
-                border-radius: 50%;
-                opacity: 0.5;
-            }
-            
-            .g-pulse {
-                position: absolute;
-                width: 8rpx;
-                height: 8rpx;
-                background: @text-tertiary;
-                border-radius: 50%;
-                animation: pulseGhost 2s infinite;
-            }
-        }
-
-        .ghost-text {
-            font-size: 24rpx;
-            font-weight: 700;
-            color: @text-secondary;
-            letter-spacing: 2rpx;
-            margin-bottom: 8rpx;
-        }
-
-        .ghost-sub {
-            font-family: 'Courier New', monospace;
-            font-size: 20rpx;
-            color: @text-tertiary;
-            
-            .blink {
-                animation: blinkCursor 1s infinite;
-            }
-        }
+        .ghost-text { font-size: 24rpx; font-weight: 700; color: @text-secondary; letter-spacing: 2rpx; margin-bottom: 8rpx; }
+        .ghost-sub { font-family: 'Courier New', monospace; font-size: 20rpx; color: @text-tertiary; .blink { animation: blinkCursor 1s infinite; } }
     }
 }
 
-@keyframes pulseGhost { 
-    0% { transform: scale(1); opacity: 1; } 
-    50% { transform: scale(1.5); opacity: 0.5; } 
-    100% { transform: scale(1); opacity: 1; } 
-}
-
+@keyframes pulseGhost { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
 @keyframes blinkCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 // Section Header
 .section-header {
-  display: flex; 
-  justify-content: space-between; 
-  align-items: flex-end; 
-  margin-bottom: 32rpx;
-  padding-bottom: 16rpx;
-  border-bottom: 1rpx solid @bg-hover;
-
+  display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32rpx; padding-bottom: 16rpx; border-bottom: 1rpx solid @bg-hover;
   .title { font-size: 32rpx; font-weight: 700; color: @text-primary; letter-spacing: -0.5rpx; }
-  .sort-btn { 
-      font-size: 24rpx; 
-      color: @text-secondary; 
-      display: flex; 
-      align-items: center; 
-      gap: 8rpx; 
-      padding: 8rpx 16rpx;
-      background: @bg-hover;
-      border-radius: 8rpx;
-      
-      &:active { opacity: 0.7; }
-
-      .icon-sort {
-          width: 0; height: 0; 
-          border-left: 8rpx solid transparent; 
-          border-right: 8rpx solid transparent; 
-          transition: transform 0.3s;
-          
+  .sort-btn { font-size: 24rpx; color: @text-secondary; display: flex; align-items: center; gap: 8rpx; padding: 8rpx 16rpx; background: @bg-hover; border-radius: 8rpx;
+      .icon-sort { width: 0; height: 0; border-left: 8rpx solid transparent; border-right: 8rpx solid transparent; transition: transform 0.3s;
           &.desc { border-top: 10rpx solid @text-primary; }
           &.asc { border-top: 10rpx solid @text-primary; transform: rotate(180deg); }
       }
   }
 }
 
-// Timeline (Linear Style)
-.timeline-box {
-  position: relative;
-  padding-left: 24rpx; // Space for left node
-  min-height: 400rpx;
-  transition: opacity 0.3s ease;
-  
-  &.animate-switch {
-      opacity: 0.5;
+// Timeline
+.timeline-box { position: relative; padding-left: 24rpx; min-height: 400rpx; transition: opacity 0.3s ease; &.animate-switch { opacity: 0.5; } }
+.timeline-line { position: absolute; left: 31rpx; top: 16rpx; bottom: 40rpx; width: 2rpx; background: @border-light; z-index: 0; }
+.timeline-item { position: relative; margin-bottom: 48rpx; padding-left: 48rpx; z-index: 1; opacity: 0; animation: fadeIn 0.4s ease forwards;
+  .timeline-node { position: absolute; left: 0; top: 10rpx; width: 16rpx; height: 16rpx; background: @bg-base; display: flex; align-items: center; justify-content: center; z-index: 2;
+    .dot { width: 12rpx; height: 12rpx; border-radius: 50%; background: #D4D4D8; border: 2rpx solid @bg-base; transition: background 0.3s; }
+    &.pulse { .dot { background: @accent-purple; } &::after { content: ''; position: absolute; top: -8rpx; left: -8rpx; right: -8rpx; bottom: -8rpx; border-radius: 50%; animation: pulseRing 2s infinite; } }
   }
-}
-
-.timeline-line {
-  position: absolute;
-  left: 31rpx; // Center align with dots
-  top: 16rpx;
-  bottom: 40rpx;
-  width: 2rpx;
-  background: @border-light;
-  z-index: 0;
-}
-
-.timeline-item {
-  position: relative;
-  margin-bottom: 48rpx;
-  padding-left: 48rpx; // Content padding
-  z-index: 1;
-  opacity: 0;
-  animation: fadeIn 0.4s ease forwards;
-
-  // Visual Node
-  .timeline-node {
-    position: absolute;
-    left: 0;
-    top: 10rpx; // Align with title baseline
-    width: 16rpx;
-    height: 16rpx;
-    background: @bg-base; // Mask line
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2;
-    
-    .dot {
-      width: 12rpx;
-      height: 12rpx;
-      border-radius: 50%;
-      background: #D4D4D8; // Default grey
-      border: 2rpx solid @bg-base; // Mask
-      transition: background 0.3s;
-    }
-
-    // Active Status Pulse
-    &.pulse {
-       .dot {
-          background: @accent-purple;
-       }
-       &::after {
-           content: '';
-           position: absolute;
-           top: -8rpx; left: -8rpx; right: -8rpx; bottom: -8rpx;
-           border-radius: 50%;
-           animation: pulseRing 2s infinite;
-       }
-    }
-  }
-
   .timeline-content {
-    .row-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 8rpx;
-      
-      .item-title { 
-          font-size: 28rpx; 
-          font-weight: 600; 
-          color: @text-primary; 
-      }
-      .item-time { 
-          font-family: 'Courier New', monospace; 
-          font-size: 22rpx; 
-          color: @text-tertiary; 
-          letter-spacing: -0.5rpx;
-      }
+    .row-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8rpx;
+      .item-title { font-size: 28rpx; font-weight: 600; color: @text-primary; }
+      .item-time { font-family: 'Courier New', monospace; font-size: 22rpx; color: @text-tertiary; letter-spacing: -0.5rpx; }
     }
-    
-    .item-desc {
-      font-size: 26rpx;
-      color: @text-secondary;
-      line-height: 1.6;
-    }
+    .item-desc { font-size: 26rpx; color: @text-secondary; line-height: 1.6; }
   }
 }
 
-.empty-state {
-    padding: 60rpx 0;
-    text-align: center;
-    color: @text-tertiary;
-    font-size: 28rpx;
-}
+.empty-state { padding: 60rpx 0; text-align: center; color: @text-tertiary; font-size: 28rpx; }

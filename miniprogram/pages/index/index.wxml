@@ -21,52 +21,55 @@
     </view>
 
     <!-- 1. Normal State: Project List -->
-    <scroll-view 
+    <!-- 1. Normal State: Project Swiper (Hero Card Style) -->
+    <swiper 
       wx:if="{{projectsData.length > 0}}"
-      scroll-x 
-      class="project-scroll {{projectsData.length === 1 ? 'mode-single' : ''}}" 
-      enable-flex 
-      show-scrollbar="{{false}}"
+      class="project-swiper"
+      circular="{{false}}"
+      previous-margin="90rpx"
+      next-margin="90rpx"
+      current="{{currentSwiperIndex}}"
+      bindchange="onSwiperChange"
     >
-      <view class="project-card {{activeId === item.id ? 'active' : ''}}" 
-            wx:for="{{projectsData}}" 
-            wx:key="id"
-            bindtap="onProjectSelect"
-            data-index="{{index}}">
-        
-        <view class="card-top">
-          <view class="source-badge {{item.sourceClass}}">{{item.sourceText}}</view>
-          <view class="status-indicator">
-            <view class="status-dot" style="background: {{item.tagColor}}"></view>
-            <view class="status-badge">{{item.statusDesc}}</view>
+      <swiper-item wx:for="{{projectsData}}" wx:key="id" class="swiper-item">
+        <view class="project-card {{activeId === item.id ? 'active' : ''}}" 
+              bindtap="onProjectSelect"
+              data-index="{{index}}">
+          
+          <view class="card-top">
+            <view class="source-badge {{item.sourceClass}}">{{item.sourceText}}</view>
+            <view class="status-indicator">
+              <view class="status-dot" style="background: {{item.tagColor}}"></view>
+              <view class="status-badge">{{item.statusDesc}}</view>
+            </view>
+          </view>
+
+          <view class="card-main">
+              <view class="project-name">{{item.name}}</view>
+              <view class="project-material">{{item.material}}</view>
+          </view>
+          
+          <view class="card-stats-grid">
+              <view class="stat-col">
+                  <text class="label">{{text.created}}</text>
+                  <text class="val">{{item.createDate}}</text>
+              </view>
+          </view>
+
+          <view class="card-bottom">
+              <view class="progress-section">
+                  <view class="progress-label">
+                      <text>{{text.progress}}</text>
+                      <text>{{item.progress}}%</text>
+                  </view>
+                  <view class="progress-bar-bg">
+                      <view class="progress-bar-fill" style="--progress: {{item.progress}}%; --tag-color: {{item.tagColor}};"></view>
+                  </view>
+              </view>
           </view>
         </view>
-
-        <view class="card-main">
-            <view class="project-name">{{item.name}}</view>
-            <view class="project-material">{{item.material}}</view>
-        </view>
-        
-        <view class="card-stats-grid">
-            <view class="stat-col">
-                <text class="label">{{text.created}}</text>
-                <text class="val">{{item.createDate}}</text>
-            </view>
-        </view>
-
-        <view class="card-bottom">
-            <view class="progress-section">
-                <view class="progress-label">
-                    <text>{{text.progress}}</text>
-                    <text>{{item.progress}}%</text>
-                </view>
-                <view class="progress-bar-bg">
-                    <view class="progress-bar-fill" style="--progress: {{item.progress}}%; --tag-color: {{item.tagColor}};"></view>
-                </view>
-            </view>
-        </view>
-      </view>
-    </scroll-view>
+      </swiper-item>
+    </swiper>
 
     <!-- 2. Empty State: The "Ghost" Card -->
     <view wx:else class="empty-card-container">
