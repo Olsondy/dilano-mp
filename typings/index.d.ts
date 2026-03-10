@@ -5,6 +5,7 @@ interface IAppOption {
     userInfo?: WechatMiniprogram.UserInfo,
   }
   userInfoReadyCallback?: WechatMiniprogram.GetUserInfoSuccessCallback,
+  checkUpdate?(): void,
 }
 
 // 扩展隐私协议接口定义
