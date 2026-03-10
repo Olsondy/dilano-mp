@@ -1,25 +1,7 @@
-# WeChat Mini Program - dln-customer
+`AGENTS.md` is the canonical cross-IDE governance document for this repository.
 
-**Context:** TypeScript | Less | TDesign UI | Skyline Rendering | Custom Navigation
+When using Gemini tooling in this project:
 
-## Critical Development Rules
-
-1.  **Build Process**:
-    - `packNpmManually: true` is set.
-    - Run `npm install` -> Open DevTools -> **Tools** -> **Build npm**.
-    - merely `npm install` is INSUFFICIENT.
-
-2.  **New Pages**:
-    - MUST create 4 files: `.wxml`, `.ts`, `.less`, `.json`.
-    - MUST register new page path in `miniprogram/app.json`.
-
-## AI Token Optimization Rules
-
-1.  **Efficient Reading**:
-    - Do NOT read `package-lock.json` or large `miniprogram_npm` directories.
-    - Use `view_file_outline` FIRST to understand file structure before reading full content.
-    - Read only relevant line ranges when debugging or modifying.
-
-2.  **Concise Context**:
-    - Avoid listing all files in directory unless searching for something specific.
-    - Focus on `miniprogram/pages` and `miniprogram/components` for feature work.
+1. Follow all standards and workflows defined in `AGENTS.md`.
+2. Use domain docs referenced by `AGENTS.md` (`AUTHENTICATION`, `INTERNATIONALIZATION`, etc.).
+3. If this file and `AGENTS.md` ever diverge, treat `AGENTS.md` as source of truth.
