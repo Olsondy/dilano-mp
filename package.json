@@ -1,7 +1,8 @@
 {
 	"name": "dilano-customer",
-	"version": "1.0.0",
-	"description": "",
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.28.2",
+  "type": "module",
 	"scripts": {
 		"prepare": "husky"
 	},

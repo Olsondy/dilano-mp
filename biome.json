@@ -32,6 +32,13 @@
 			}
 		}
 	},
+	"overrides": [
+		{
+			"includes": ["typings/**"],
+			"linter": { "enabled": false },
+			"formatter": { "enabled": false }
+		}
+	],
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "single"
