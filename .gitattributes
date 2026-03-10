@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.wxml text eol=lf
+*.wxss text eol=lf
+*.less text eol=lf
+*.ts text eol=lf
+*.js text eol=lf
+*.json text eol=lf

@@ -1,6 +1,6 @@
 <!--index.wxml-->
 <view class="page-container">
-  <navigation-bar title="{{text.dashboard}}" back="{{false}}" color="#000" background="#FFF"></navigation-bar>
+  <navigation-bar back="{{false}}" color="#000" background="#FFF"></navigation-bar>
   
   <view wx:if="{{loading}}" class="skeleton-screen">
     <view class="sk-header"></view>
@@ -38,9 +38,12 @@
           
           <view class="card-top">
             <view class="source-badge {{item.sourceClass}}">{{item.sourceText}}</view>
-            <view class="status-indicator">
-              <view class="status-dot" style="background: {{item.tagColor}}"></view>
-              <view class="status-badge">{{item.statusDesc}}</view>
+            <view class="right-group">
+              <view wx:if="{{item.isTimeout}}" class="timeout-badge">{{text.timeout}}</view>
+              <view class="status-indicator">
+                <view class="status-dot" style="background: {{item.tagColor}}"></view>
+                <view class="status-badge">{{item.statusDesc}}</view>
+              </view>
             </view>
           </view>
 

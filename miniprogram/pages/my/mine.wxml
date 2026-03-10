@@ -1,7 +1,7 @@
 <!--miniprogram/pages/my/mine.wxml-->
 <view class="page-container">
   <t-toast id="t-toast" />
-  <navigation-bar title="{{text.pageTitle}}" back="{{false}}" color="#000" background="#FFF"></navigation-bar>
+  <navigation-bar back="{{false}}" color="#000" background="#FFF"></navigation-bar>
   
   <view class="content-wrapper">
     <!-- Profile Header -->

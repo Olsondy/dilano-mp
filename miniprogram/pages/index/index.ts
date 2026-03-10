@@ -27,6 +27,7 @@ interface BackendProject {
     createTime: string;
     projectSource?: string; // "self" | "referred"
     timelineList?: BackendTimelineItem[];
+    progress?: number;
 }
 
 interface ApiResponse {
@@ -46,15 +47,16 @@ interface UIProject {
   name: string;
   material: string; 
   createDate: string; 
-  commission: string; 
+  commission: string;
   progress: number;
   timeline: TimelineItem[];
   themeColor: string;
   sourceText: string;
   sourceClass: string;
-}
+  isTimeout: boolean;
+  }
 
-const i18n = {
+  const i18n: Record<string, any> = {
   en: {
     dashboard: "Dashboard",
     overview: "Overview",
@@ -65,8 +67,9 @@ const i18n = {
     activity: "Activity",
     sort: "Sort",
     noActivity: "No recent activity",
-    sourceSelf: "MINE",
-    sourceReferred: "REFERRAL"
+    sourceSelf: "SELF",
+    sourceReferred: "REFERRAL",
+    timeout: "DELAYED"
   },
   zh: {
     dashboard: "仪表盘",
@@ -78,10 +81,11 @@ const i18n = {
     activity: "动态",
     sort: "排序",
     noActivity: "暂无最新动态",
-    sourceSelf: "个人",
-    sourceReferred: "推荐"
+    sourceSelf: "自拓",
+    sourceReferred: "推荐",
+    timeout: "已超时"
   }
-};
+  };
 
 Page({
   data: {
@@ -206,28 +210,21 @@ Page({
       };
       const statusDesc = phaseMap[item.projectPhase] || item.projectPhase;
 
-      // 2. 进度映射
-      const progressMap: Record<string, number> = {
-          'created': 10,
-          'quoted': 35,
-          'signed': 70,
-          'finished': 100
-      };
+      // 2. 进度映射 (Removed: now using backend progress)
       
-      // 3. 颜色映射
-      const colorMap: Record<string, string> = {
-          'created': '#71717A', // Zinc-500
-          'quoted': '#5E6AD2',  // Linear Purple
-          'signed': '#0070F3',  // Vercel Blue
-          'finished': '#10B981' // Emerald-500
-      };
-
-      let color = colorMap[item.projectPhase] || '#000';
-      
-      // 4. 超时处理 (API: "1" = 超时)
-      if (item.phaseTimeout === '1') {
-          color = '#E5484D'; // Red
+      // 3. 颜色映射 (基于进度)
+      let color = '#71717A'; // Zinc-500 (<30)
+      const progressValue = item.progress || 0;
+      if (progressValue >= 100) {
+          color = '#10B981'; // Emerald-500
+      } else if (progressValue >= 60) {
+          color = '#0070F3'; // Vercel Blue
+      } else if (progressValue >= 30) {
+          color = '#5E6AD2'; // Linear Purple
       }
+      
+      // 4. 超时处理 (API: "0" = 超时)
+      const isTimeout = item.phaseTimeout === '0';
 
       // 5. 佣金计算 (报价 * 比例)
       let commissionVal = '0.00';
@@ -279,10 +276,11 @@ Page({
           material: materialStr,
           createDate: item.createTime ? item.createTime.substring(0, 16) : '', // 保留 YYYY-MM-DD HH:mm
           commission: commissionVal,
-          progress: progressMap[item.projectPhase] || 0,
+          progress: item.progress || 0,
           timeline: timeline,
           sourceText: sourceText,
-          sourceClass: sourceClass
+          sourceClass: sourceClass,
+          isTimeout: isTimeout
       };
   },
 
