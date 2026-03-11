@@ -5,7 +5,7 @@ import { HeartbeatService } from './utils/heartbeat';
 App<IAppOption>({
   globalData: {},
   onLaunch() {
-    this.checkUpdate();
+    this.checkUpdate?.();
     
     // 展示本地存储能力
     const logs = wx.getStorageSync('logs') || []
