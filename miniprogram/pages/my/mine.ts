@@ -16,7 +16,6 @@ const i18n = {
     contact: "Contact Us",
     feedback: "Feedback",
     clearCache: "Clear Cache",
-    userAgreement: "User Agreement",
     deleteAccount: "Delete Account",
     cacheCleared: "Cache cleared successfully",
     deleteConfirm: "注销后，您将无法通过此手机号再次登录小程序。如需保留查看权限，请仅选择退出登录。确定要注销吗？",
@@ -25,9 +24,8 @@ const i18n = {
     loginTitle: "Welcome to DILANO",
     loginDesc: "Login to unlock exclusive service experience",
     loginBtn: "One-click Login",
-    agreeText: "I have read and agree to",
-    agreeErr: "Please read and agree to ",
-    andText: " and ",
+    agreeText: "I have read and agree to the Privacy Policy",
+    agreeErr: "Please read and agree to the Privacy Policy",
     privacyLink: "Privacy Policy",
     loading: "Verifying...",
     logoutConfirm: "Are you sure to log out?",
@@ -47,7 +45,6 @@ const i18n = {
     contact: "联系客服",
     feedback: "意见反馈",
     clearCache: "清除缓存",
-    userAgreement: "用户协议",
     deleteAccount: "注销账号",
     cacheCleared: "缓存已清理",
     deleteConfirm: "注销后，您将无法通过此手机号再次登录小程序。如需保留查看权限，请仅选择退出登录。确定要注销吗？",
@@ -56,9 +53,8 @@ const i18n = {
     loginTitle: "欢迎来到迪兰诺",
     loginDesc: "立即登录，开启您的专属服务体验",
     loginBtn: "一键登录",
-    agreeText: "我已阅读并同意",
-    agreeErr: "请先阅读并同意",
-    andText: "和",
+    agreeText: "我已阅读并同意《隐私协议》",
+    agreeErr: "请先阅读并同意《隐私协议》",
     privacyLink: "《隐私协议》",
     loading: "验证中",
     logoutConfirm: "确定要退出登录吗？",
@@ -279,13 +275,6 @@ Page({
       fail: () => {
         Toast({ context: this, selector: '#t-toast', message: '无法打开隐私协议' });
       }
-    });
-  },
-
-  handleAgreement() {
-    const url = encodeURIComponent('https://dilano.cloud/userTerm.html');
-    wx.navigateTo({
-      url: `/pages/webview/index?url=${url}`
     });
   },
 
