@@ -1,4 +1,6 @@
+# Biome 格式检查并自动添加改动
 npx @biomejs/biome check --write --staged --no-errors-on-unmatched
+git add -u
 
 # TypeScript 类型检查
 npx tsc --noEmit
