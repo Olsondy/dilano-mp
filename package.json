@@ -7,6 +7,7 @@
     "prepare": "husky",
     "typecheck": "tsc --noEmit",
     "lint:staged": "biome check --write --staged --no-errors-on-unmatched",
+    "test:compat": "node --test ./tests/devtools-compat.test.mjs",
     "test:i18n": "node --loader ./tests/ts-extension-loader.mjs --test ./tests/i18n.test.mjs"
   },
   "keywords": [],

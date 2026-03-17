@@ -4,7 +4,7 @@ import {
   buildDisplayId,
   getCurrentLang,
   getI18nText,
-  type LangType,
+  LangType,
   setCurrentLang,
 } from '../../utils/i18n';
 import mineI18n, { mineRoleI18n } from './i18n';

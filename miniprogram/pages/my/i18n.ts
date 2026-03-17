@@ -1,4 +1,4 @@
-import type { LangType } from '../../utils/i18n';
+import { LangType } from '../../utils/i18n';
 
 const mineI18n = {
   en: {

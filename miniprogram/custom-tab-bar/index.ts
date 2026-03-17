@@ -1,4 +1,4 @@
-import { getCurrentLang, type LangType } from '../utils/i18n';
+import { getCurrentLang, LangType } from '../utils/i18n';
 import tabBarI18n from './i18n';
 
 Component({

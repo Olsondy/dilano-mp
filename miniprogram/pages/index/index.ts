@@ -1,7 +1,7 @@
 /**
  * 接口定义
  */
-import { getCurrentLang, getI18nText, type LangType } from '../../utils/i18n';
+import { getCurrentLang, getI18nText, LangType } from '../../utils/i18n';
 import { request } from '../../utils/request';
 import indexI18n from './i18n';
 

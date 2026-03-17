@@ -46,6 +46,9 @@ pnpm exec biome check .
 # 仅检查并格式化已暂存文件（与 pre-commit 一致）
 pnpm run lint:staged
 
+# 微信开发者工具兼容性检查
+pnpm run test:compat
+
 # Biome 自动修复
 pnpm exec biome check --write .
 
@@ -115,6 +118,7 @@ Documentation should reflect the actual implementation, not intended behavior.
 - TypeScript / JavaScript / JSON 统一使用 Biome；缩进为 2 个空格，TS/JS 默认单引号，行尾为 LF。
 - `tsconfig.json` 已启用严格模式：`strict`、`noImplicitAny`、`noUnusedLocals`、`noUnusedParameters` 等规则默认生效。
 - 类型检查统一通过本地脚本 `pnpm run typecheck` 触发；不要假定系统里存在全局 `tsc`。
+- 小程序源码里不要使用 `import type` 或 `import { ..., type Foo }` 这类写法，微信开发者工具的 TS 编译兼容性不稳定；需要时优先使用普通导入。
 - WXML / Less 当前未接入统一格式化器，编辑时保持与周边文件风格一致，避免无意义的大面积重排。
 - 提交前至少自行执行一次 `pnpm run typecheck`；涉及 TS/JS/JSON 变更时建议执行 `pnpm exec biome check --write <paths>`。
 - `typings/` 已在 Biome override 中排除，不要为了格式化而重写类型声明文件。
