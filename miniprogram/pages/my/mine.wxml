@@ -21,10 +21,6 @@
     <!-- Stats Grid (Linear Style) -->
     <view class="stats-grid">
       <view class="stat-card">
-        <text class="stat-label">{{text.commissionLabel}}</text>
-        <text class="stat-value">¥{{commission}}</text>
-      </view>
-      <view class="stat-card">
         <text class="stat-label">{{text.referrerLabel}}</text>
         <text class="stat-value">{{referrer}}</text>
       </view>
@@ -41,7 +37,7 @@
             <view class="menu-item" hover-class="item-active" bindtap="toggleLanguage">
                 <text class="item-text">{{text.language}}</text>
                 <view class="item-right">
-                    <text class="value-text">{{currentLang === 'en' ? 'English' : '中文'}}</text>
+                    <text class="value-text">{{text.languageValue}}</text>
                     <view class="arrow-right"></view>
                 </view>
             </view>
@@ -169,7 +165,7 @@
                 <text class="name">{{item.partyName}}</text>
             </view>
         </block>
-        <view class="list-footer">Total: {{referralList.length}}</view>
+        <view class="list-footer">{{text.referralsTotal}}: {{referralList.length}}</view>
       </scroll-view>
     </view>
   </t-popup>

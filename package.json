@@ -1,20 +1,24 @@
 {
-	"name": "dilano-customer",
+  "name": "dilano-customer",
   "version": "0.1.0",
   "packageManager": "pnpm@10.28.2",
   "type": "module",
-	"scripts": {
-		"prepare": "husky"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "",
-	"dependencies": {
-		"tdesign-miniprogram": "^1.12.0"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "^2.4.6",
-		"husky": "^9.1.7",
-		"miniprogram-api-typings": "^2.8.3-1"
-	}
+  "scripts": {
+    "prepare": "husky",
+    "typecheck": "tsc --noEmit",
+    "lint:staged": "biome check --write --staged --no-errors-on-unmatched",
+    "test:i18n": "node --loader ./tests/ts-extension-loader.mjs --test ./tests/i18n.test.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "tdesign-miniprogram": "^1.12.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.6",
+    "husky": "^9.1.7",
+    "miniprogram-api-typings": "^2.8.3-1",
+    "typescript": "^5.9.3"
+  }
 }

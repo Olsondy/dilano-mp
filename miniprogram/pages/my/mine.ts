@@ -1,87 +1,39 @@
 import Toast from 'tdesign-miniprogram/toast/index';
 import { AuthService } from '../../utils/auth';
+import {
+  buildDisplayId,
+  getCurrentLang,
+  getI18nText,
+  type LangType,
+  setCurrentLang,
+} from '../../utils/i18n';
+import mineI18n, { mineRoleI18n } from './i18n';
 
-const i18n = {
-  en: {
-    pageTitle: 'Account',
-    commissionLabel: 'Total Rewards',
-    referrerLabel: 'Inviter',
-    generalSection: 'GENERAL',
-    referrals: 'My Invitations',
-    privacy: 'Privacy Policy',
-    about: 'About',
-    language: 'Language',
-    supportSection: 'SUPPORT',
-    logout: 'Log Out',
-    contact: 'Contact Us',
-    feedback: 'Feedback',
-    clearCache: 'Clear Cache',
-    deleteAccount: 'Delete Account',
-    cacheCleared: 'Cache cleared successfully',
-    deleteConfirm:
-      '注销后，您将无法通过此手机号再次登录小程序。如需保留查看权限，请仅选择退出登录。确定要注销吗？',
-    legalSection: 'LEGAL',
-    footer: 'DILANO v1.0.0',
-    loginTitle: 'Welcome to DILANO',
-    loginDesc: 'Login to unlock exclusive service experience',
-    loginBtn: 'One-click Login',
-    agreeText: 'I have read and agree to the Privacy Policy',
-    agreeErr: 'Please read and agree to the Privacy Policy',
-    privacyLink: 'Privacy Policy',
-    loading: 'Verifying...',
-    logoutConfirm: 'Are you sure to log out?',
-    logoutLoading: 'Logging out...',
-  },
-  zh: {
-    pageTitle: '个人中心',
-    commissionLabel: '累计奖励',
-    referrerLabel: '邀请人',
-    generalSection: '常规设置',
-    referrals: '我的邀请',
-    privacy: '隐私条款',
-    about: '关于',
-    language: '语言设置',
-    supportSection: '支持与服务',
-    logout: '退出登录',
-    contact: '联系客服',
-    feedback: '意见反馈',
-    clearCache: '清除缓存',
-    deleteAccount: '注销账号',
-    cacheCleared: '缓存已清理',
-    deleteConfirm:
-      '注销后，您将无法通过此手机号再次登录小程序。如需保留查看权限，请仅选择退出登录。确定要注销吗？',
-    legalSection: '法律与合规',
-    footer: 'DILANO v1.0.0',
-    loginTitle: '欢迎来到迪兰诺',
-    loginDesc: '立即登录，开启您的专属服务体验',
-    loginBtn: '一键登录',
-    agreeText: '我已阅读并同意《隐私协议》',
-    agreeErr: '请先阅读并同意《隐私协议》',
-    privacyLink: '《隐私协议》',
-    loading: '验证中',
-    logoutConfirm: '确定要退出登录吗？',
-    logoutLoading: '退出中',
-  },
-};
+const defaultLang: LangType = 'en';
+const getText = (lang: LangType) => getI18nText(mineI18n, lang);
+type MineText = ReturnType<typeof getText>;
 
-type LangType = 'en' | 'zh';
+interface MineUserInfo {
+  nickname: string;
+  phone: string;
+  avatar: string;
+  role: string;
+  partyType: string;
+}
 
-const ROLE_MAP: Record<string, { en: string; zh: string }> = {
-  customer: { en: 'CUSTOMER', zh: '客户' },
-  referral: { en: 'INVITER', zh: '邀请人' },
-};
+const getGuestUserInfo = (lang: LangType): MineUserInfo => ({
+  nickname: getText(lang).guestName,
+  phone: getText(lang).guestPhone,
+  avatar: '/assets/default_avatar.png',
+  role: getText(lang).guestRole,
+  partyType: '',
+});
 
 Page({
   data: {
-    currentLang: 'en' as LangType,
-    text: i18n.en,
-    userInfo: {
-      nickname: 'Guest',
-      phone: 'Please login',
-      avatar: '/assets/default_avatar.png',
-      role: 'GUEST',
-      partyType: '',
-    },
+    currentLang: defaultLang as LangType,
+    text: getText(defaultLang) as MineText,
+    userInfo: getGuestUserInfo(defaultLang) as MineUserInfo,
     commission: '0.00',
     referrer: '-',
     showLogin: false,
@@ -94,30 +46,16 @@ Page({
   },
 
   onLoad() {
-    const storedLang = wx.getStorageSync('user_lang');
-    if (storedLang) {
-      this.updateContent(storedLang as LangType);
-      return;
-    }
-    try {
-      const sysInfo = wx.getSystemInfoSync();
-      const sysLang = sysInfo.language;
-      const targetLang = sysLang && sysLang.indexOf('zh') >= 0 ? 'zh' : 'en';
-      wx.setStorageSync('user_lang', targetLang);
-      this.updateContent(targetLang);
-    } catch (e) {
-      wx.setStorageSync('user_lang', 'en');
-      this.updateContent('en');
-    }
+    this.applyLanguage(getCurrentLang());
   },
 
   onShow() {
+    const currentLang = getCurrentLang();
+    this.applyLanguage(currentLang);
+
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 });
-      const storedLang = wx.getStorageSync('user_lang');
-      if (storedLang) {
-        this.getTabBar().updateTabList(storedLang);
-      }
+      this.getTabBar().updateTabList(currentLang);
     }
 
     const isRedirect = wx.getStorageSync('auth_redirect');
@@ -149,9 +87,47 @@ Page({
   */
 
   getRoleName(type: string, lang: LangType): string {
-    const map = ROLE_MAP[type];
+    const map = mineRoleI18n[type];
     if (map) return map[lang];
-    return lang === 'en' ? 'MEMBER' : '客户';
+    return getText(lang).memberName;
+  },
+
+  getLocalizedUserPhone(lang: LangType): string {
+    const displayId = this.data.userInfo.phone || '';
+    if (!displayId || displayId === this.data.text.guestPhone) {
+      return '';
+    }
+
+    const rawId = displayId.replace(/^ID:\s*/, '').trim();
+    return rawId ? buildDisplayId(rawId, lang) : displayId;
+  },
+
+  getLoggedOutState(lang: LangType) {
+    return {
+      userInfo: getGuestUserInfo(lang),
+      commission: '0.00',
+      referrer: '-',
+      referralList: [] as any[],
+      showLogin: true,
+    };
+  },
+
+  applyLanguage(lang: LangType) {
+    const text = getText(lang);
+    const currentType = this.data.userInfo.partyType;
+    const userInfo = currentType
+      ? {
+          ...this.data.userInfo,
+          role: this.getRoleName(currentType, lang),
+          phone: this.getLocalizedUserPhone(lang),
+        }
+      : getGuestUserInfo(lang);
+
+    this.setData({
+      currentLang: lang,
+      text,
+      userInfo,
+    });
   },
 
   async checkLogin() {
@@ -169,7 +145,7 @@ Page({
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
           });
-          if (referralInfo.referredBy && referralInfo.referredBy.partyName) {
+          if (referralInfo.referredBy?.partyName) {
             referrer = referralInfo.referredBy.partyName;
           }
           if (
@@ -189,25 +165,31 @@ Page({
       this.setData({
         userInfo: {
           ...this.data.userInfo,
-          nickname: userInfo.nickname || 'Member',
-          phone: userInfo.id ? `ID: ${userInfo.id}` : '',
+          nickname: userInfo.nickname || this.data.text.memberName,
+          phone: userInfo.id
+            ? buildDisplayId(userInfo.id, this.data.currentLang)
+            : '',
           avatar: userInfo.avatar || '/assets/default_avatar.png',
           role: roleName,
-          partyType: partyType,
+          partyType,
         },
         commission,
         referrer,
         referralList,
         showLogin: false,
       });
-    } catch (e) {
-      this.setData({ showLogin: true });
+    } catch (_error) {
+      this.setData(this.getLoggedOutState(this.data.currentLang));
     }
   },
 
   openReferrals() {
     if (!this.data.referralList || this.data.referralList.length === 0) {
-      Toast({ context: this, selector: '#t-toast', message: '暂无邀请记录' });
+      Toast({
+        context: this,
+        selector: '#t-toast',
+        message: this.data.text.noReferralRecords,
+      });
       return;
     }
     this.setData({ showReferrals: true });
@@ -225,22 +207,30 @@ Page({
     const { code, errMsg } = e.detail;
     if (!code) {
       if (errMsg.indexOf('deny') >= 0) {
-        Toast({ context: this, selector: '#t-toast', message: '已取消授权' });
+        Toast({
+          context: this,
+          selector: '#t-toast',
+          message: this.data.text.authorizeCancelled,
+        });
       } else {
         Toast({
           context: this,
           selector: '#t-toast',
-          message: '获取手机号失败',
+          message: this.data.text.getPhoneFailed,
         });
       }
       return;
     }
 
-    wx.showLoading({ title: '验证中', mask: true });
+    wx.showLoading({ title: this.data.text.loading, mask: true });
     try {
       await AuthService.login(code);
       wx.hideLoading();
-      Toast({ context: this, selector: '#t-toast', message: '登录成功' });
+      Toast({
+        context: this,
+        selector: '#t-toast',
+        message: this.data.text.loginSuccess,
+      });
       this.setData({ showLogin: false });
       this.checkLogin();
     } catch (err: any) {
@@ -248,40 +238,28 @@ Page({
       Toast({
         context: this,
         selector: '#t-toast',
-        message: err.message || '登录失败',
+        message: err.message || this.data.text.loginFailed,
       });
     }
   },
 
   handleLogout() {
     wx.showModal({
-      title: '提示',
-      content: '确定要退出登录吗？',
+      title: this.data.text.confirmTitle,
+      content: this.data.text.logoutConfirm,
       success: async (res) => {
         if (res.confirm) {
-          wx.showLoading({ title: '退出中', mask: true });
+          wx.showLoading({ title: this.data.text.logoutLoading, mask: true });
           try {
             await AuthService.logout();
             wx.hideLoading();
             Toast({
               context: this,
               selector: '#t-toast',
-              message: '已退出登录',
+              message: this.data.text.logoutSuccess,
             });
-            this.setData({
-              userInfo: {
-                nickname: 'Guest',
-                phone: 'Please login',
-                avatar: '/assets/default_avatar.png',
-                role: 'GUEST',
-                partyType: '',
-              },
-              commission: '0.00',
-              referrer: '-',
-              referralList: [],
-              showLogin: true,
-            });
-          } catch (e) {
+            this.setData(this.getLoggedOutState(this.data.currentLang));
+          } catch (_error) {
             wx.hideLoading();
           }
         }
@@ -296,7 +274,7 @@ Page({
         Toast({
           context: this,
           selector: '#t-toast',
-          message: '无法打开隐私协议',
+          message: this.data.text.openPrivacyFailed,
         });
       },
     });
@@ -330,38 +308,22 @@ Page({
       confirmColor: '#E5484D',
       success: async (res) => {
         if (res.confirm) {
-          wx.showLoading({ title: 'Processing...', mask: true });
+          wx.showLoading({ title: this.data.text.processing, mask: true });
           try {
             const result: any = await AuthService.deleteAccount();
             wx.hideLoading();
             Toast({
               context: this,
               selector: '#t-toast',
-              message:
-                result.msg ||
-                (this.data.currentLang === 'en'
-                  ? 'Account Deleted'
-                  : '账号已注销'),
+              message: result.msg || this.data.text.accountDeleted,
             });
-            this.setData({
-              userInfo: {
-                nickname: 'Guest',
-                phone: 'Please login',
-                avatar: '/assets/default_avatar.png',
-                role: 'GUEST',
-                partyType: '',
-              },
-              commission: '0.00',
-              referrer: '-',
-              referralList: [],
-              showLogin: true,
-            });
+            this.setData(this.getLoggedOutState(this.data.currentLang));
           } catch (e: any) {
             wx.hideLoading();
             Toast({
               context: this,
               selector: '#t-toast',
-              message: e.message || 'Operation Failed',
+              message: e.message || this.data.text.fallbackError,
             });
           }
         }
@@ -384,13 +346,21 @@ Page({
 
   handleCopyId() {
     const displayId = this.data.userInfo.phone || '';
-    const rawId = displayId.replace('ID: ', '').trim();
-    if (rawId && rawId !== 'Please login') {
+    if (!displayId || displayId === this.data.text.guestPhone) {
+      return;
+    }
+
+    const rawId = displayId.replace(/^ID:\s*/, '').trim();
+    if (rawId) {
       wx.setClipboardData({
         data: rawId,
         success: () => {
           wx.hideToast();
-          Toast({ context: this, selector: '#t-toast', message: 'ID已复制' });
+          Toast({
+            context: this,
+            selector: '#t-toast',
+            message: this.data.text.copyIdSuccess,
+          });
         },
       });
     }
@@ -398,30 +368,15 @@ Page({
 
   toggleLanguage() {
     const newLang = this.data.currentLang === 'en' ? 'zh' : 'en';
-    wx.setStorageSync('user_lang', newLang);
+    setCurrentLang(newLang);
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().updateTabList(newLang);
     }
-    this.updateContent(newLang);
+    this.applyLanguage(newLang);
     Toast({
       context: this,
       selector: '#t-toast',
-      message: newLang === 'en' ? 'Switched to English' : '已切换至中文',
-    });
-  },
-
-  updateContent(lang: LangType) {
-    const currentType = this.data.userInfo.partyType;
-    let newRole = this.data.userInfo.role;
-    if (currentType) {
-      newRole = this.getRoleName(currentType, lang);
-    } else {
-      newRole = lang === 'en' ? 'GUEST' : '访客';
-    }
-    this.setData({
-      currentLang: lang,
-      text: i18n[lang],
-      'userInfo.role': newRole,
+      message: getText(newLang).languageSwitched,
     });
   },
 

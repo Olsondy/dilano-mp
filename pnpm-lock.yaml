@@ -21,6 +21,9 @@ importers:
       miniprogram-api-typings:
         specifier: ^2.8.3-1
         version: 2.12.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
 
 packages:
 
@@ -92,6 +95,11 @@ packages:
   tdesign-miniprogram@1.12.3:
     resolution: {integrity: sha512-F4nMv/ph3yyq9bO4RrJuB9x9VWyKIN6lV1HqFaV4AsR0cpDoBYtGYLPOFejvj0MYDSntSHLMVe1nm0fqsXUaUQ==}
 
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
 snapshots:
 
   '@biomejs/biome@2.4.6':
@@ -134,3 +142,5 @@ snapshots:
   miniprogram-api-typings@2.12.0: {}
 
   tdesign-miniprogram@1.12.3: {}
+
+  typescript@5.9.3: {}
