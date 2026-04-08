@@ -1,8 +1,8 @@
 /**
  * 接口定义
  */
+import { BackendProject, getCustomerProjects } from '../../api/parties';
 import { getCurrentLang, getI18nText, LangType } from '../../utils/i18n';
-import { request } from '../../utils/request';
 import indexI18n from './i18n';
 
 interface TimelineItem {
@@ -12,36 +12,6 @@ interface TimelineItem {
   status: string;
   info: string;
   ts: number;
-}
-
-interface BackendTimelineItem {
-  description: string;
-  eventTime: string;
-  newValue: string;
-}
-
-interface BackendProject {
-  id: string;
-  projectName: string;
-  stoneTypeList: string[] | null;
-  quotedPrice: string;
-  rebateCommissionRate: string;
-  projectPhase: string;
-  lastPhaseChangeTime: string;
-  phaseTimeout: string;
-  createTime: string;
-  projectSource?: string;
-  timelineList?: BackendTimelineItem[];
-  progress?: number;
-}
-
-interface ApiResponse {
-  code: number;
-  msg: string;
-  data: {
-    partyInfo: any;
-    projectList: BackendProject[];
-  };
 }
 
 interface UIProject {
@@ -124,10 +94,7 @@ Page({
     this.setData({ loading: true });
 
     try {
-      const res = await request<ApiResponse>({
-        url: '/app/parties/customer-projects',
-        method: 'GET',
-      });
+      const res = await getCustomerProjects();
       console.log('>>> [API DEBUG] Raw Response:', res);
 
       if (res?.data?.projectList) {

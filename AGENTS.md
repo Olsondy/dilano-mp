@@ -75,7 +75,7 @@ pnpm run test:i18n
 
 - 业务代码统一放在 `miniprogram/`，不要引入与当前工程模型不一致的 `src/`、`app/`、`pages/api/` 等目录习惯。
 - 新增页面或组件时优先复用现有 `navigation-bar`、`custom-tab-bar`、`theme.less`、`utils/i18n.ts`、`utils/request.ts`。
-- API 访问默认走 `miniprogram/utils/request.ts`，不要在业务页面里直接散落 `wx.request`。
+- API 访问默认走 `miniprogram/api/<domain>.ts`，由 API 模块复用 `miniprogram/utils/request.ts`；不要在业务页面里直接散落后端 URL 或 `wx.request`。
 - 文案必须进入页面级 `i18n.ts` 或 `miniprogram/locales/common.ts`，不要把中英文硬编码进 WXML / TS。
 - `miniprogram/miniprogram_npm/` 是构建产物，禁止手动编辑。
 
@@ -179,6 +179,13 @@ dln-customer/
 │  ├─ app.less
 │  ├─ app.ts
 │  ├─ sitemap.json
+│  ├─ api/
+│  │  ├─ auth.ts
+│  │  ├─ heartbeat.ts
+│  │  ├─ index.ts
+│  │  ├─ parties.ts
+│  │  ├─ routes.ts
+│  │  └─ user.ts
 │  ├─ assets/
 │  │  └─ default_avatar.png
 │  ├─ components/
@@ -215,6 +222,7 @@ dln-customer/
 │  │  └─ theme.less
 │  └─ utils/
 │     ├─ auth.ts
+│     ├─ auth-state.ts
 │     ├─ config.ts
 │     ├─ heartbeat.ts
 │     ├─ i18n.ts

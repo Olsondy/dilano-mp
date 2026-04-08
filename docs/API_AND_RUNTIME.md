@@ -6,6 +6,12 @@
 
 - `miniprogram/utils/config.ts`
 - `miniprogram/utils/config.example.ts`
+- `miniprogram/api/auth.ts`
+- `miniprogram/api/heartbeat.ts`
+- `miniprogram/api/parties.ts`
+- `miniprogram/api/routes.ts`
+- `miniprogram/api/user.ts`
+- `miniprogram/utils/auth-state.ts`
 - `miniprogram/utils/request.ts`
 - `miniprogram/utils/heartbeat.ts`
 - `miniprogram/utils/auth.ts`
@@ -51,6 +57,16 @@ export const config = {
 
 统一请求入口是 `miniprogram/utils/request.ts`。
 
+后端服务接口按领域放在 `miniprogram/api/`：
+
+- `api/auth.ts`：静默登录、一键登录、退出登录
+- `api/user.ts`：用户信息、账号注销
+- `api/parties.ts`：客户项目、报备/佣金信息
+- `api/heartbeat.ts`：前后台心跳
+- `api/routes.ts`：后端接口路径常量
+
+页面和业务服务优先调用 `api/` 模块，不要在页面或 `AuthService` 中继续散落后端 URL。
+
 ### Default Behavior
 
 请求层默认：
@@ -59,6 +75,7 @@ export const config = {
 - 默认 `Content-Type: application/json`
 - 读取本地 `access_token`
 - 若 token 存在则注入 `Authorization: Bearer <token>`
+- 启动静默登录进行中时，除 `POST /app/v1/auth/silent-login` 自身外，其他请求会先等待静默登录完成，再读取最新 token 并发出
 
 当前 token 生命周期由后端控制：
 
@@ -114,9 +131,9 @@ HTTP `2xx` 下仍会检查业务码：
 
 当前页面职责：
 
-- 首页拉取 `customer-projects`
-- 我的页拉取 `user` 与 `referral-info`
-- App 前后台切换发送 `heartbeat`
+- 首页通过 `api/parties.ts` 拉取 `customer-projects`
+- 我的页通过 `api/user.ts` 拉取 `user`，通过 `api/parties.ts` 拉取 `referral-info`
+- App 前后台切换通过 `api/heartbeat.ts` 发送 `heartbeat`
 
 ## App Lifecycle
 
@@ -140,6 +157,8 @@ AuthService.bootstrapSession().then(...)
 
 用于在应用启动时统一执行静默登录，并根据状态决定后续登录路径。
 
+`bootstrapSession()` 会登记一个共享启动 promise，请求层会读取该状态来避免首页、我的页或心跳在 token 刷新完成前携带旧 token 发起请求。
+
 ### 3. Heartbeat
 
 - `onShow()` -> `HeartbeatService.start()`
@@ -153,7 +172,7 @@ AuthService.bootstrapSession().then(...)
 
 - 心跳周期为 5 分钟
 - 仅在本地存在 token 时发送
-- 接口为 `GET /app/v1/heartbeat`
+- 接口定义在 `api/heartbeat.ts`，路径为 `GET /app/v1/heartbeat`
 - 会把当前时间戳作为 `data.timestamp` 发给后端
 
 `start()` 逻辑：
@@ -189,7 +208,8 @@ AuthService.bootstrapSession().then(...)
 
 ## Guardrails
 
-- 新增普通 JSON 接口时，默认只扩展 `request()` 调用点，不新增第二套网络封装。
+- 新增普通 JSON 接口时，默认只扩展 `api/` 模块并复用 `request()`，不新增第二套网络封装。
+- 新增后端服务接口时，默认放到 `miniprogram/api/<domain>.ts`，不要把接口 URL 写在页面或 `utils/auth.ts` 中。
 - 新增环境变量时，优先放到 `config.ts`，不要分散到页面常量。
 - `silent-login` 统一由 `App.onLaunch` 调用，避免页面层重复触发。
 - 修改心跳频率或路径时，务必同步检查 `App.onShow` / `onHide` 调用关系。

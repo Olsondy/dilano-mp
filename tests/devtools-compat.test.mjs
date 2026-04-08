@@ -4,11 +4,20 @@ import path from 'node:path';
 import test from 'node:test';
 
 const files = [
+  'miniprogram/api/auth.ts',
+  'miniprogram/api/heartbeat.ts',
+  'miniprogram/api/index.ts',
+  'miniprogram/api/parties.ts',
+  'miniprogram/api/routes.ts',
+  'miniprogram/api/user.ts',
   'miniprogram/custom-tab-bar/index.ts',
   'miniprogram/pages/index/index.ts',
   'miniprogram/pages/my/i18n.ts',
   'miniprogram/pages/my/mine.ts',
+  'miniprogram/utils/auth-state.ts',
+  'miniprogram/utils/auth.ts',
   'miniprogram/utils/i18n.ts',
+  'miniprogram/utils/request.ts',
 ];
 
 const forbiddenPatterns = [/\bimport\s+type\b/, /,\s*type\s+[A-Za-z_][A-Za-z0-9_]*/];

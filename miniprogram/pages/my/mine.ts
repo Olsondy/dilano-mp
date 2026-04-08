@@ -1,4 +1,6 @@
 import Toast from 'tdesign-miniprogram/toast/index';
+import { getReferralInfo } from '../../api/parties';
+import { getUserInfo } from '../../api/user';
 import { AuthService } from '../../utils/auth';
 import {
   buildDisplayId,
@@ -132,13 +134,13 @@ Page({
 
   async checkLogin() {
     try {
-      const userInfo = await AuthService.getUserInfo();
+      const userInfo = await getUserInfo();
       let commission = '0.00';
       let referrer = '-';
       let referralList: any[] = [];
 
       try {
-        const referralInfo = await AuthService.getReferralInfo();
+        const referralInfo = await getReferralInfo();
         if (referralInfo) {
           const total = Number(referralInfo.totalCommission || 0);
           commission = total.toLocaleString('en-US', {

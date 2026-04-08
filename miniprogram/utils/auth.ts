@@ -1,40 +1,24 @@
+import * as authApi from '../api/auth';
+import * as userApi from '../api/user';
+import {
+  getAuthBootstrapPromise,
+  getToken,
+  removeToken,
+  setAuthBootstrapPromise,
+  setToken,
+} from './auth-state';
 import { config } from './config';
-import { request } from './request';
 
-const TOKEN_KEY = 'access_token';
-
-export interface UserInfo {
-  id: string;
-  nickname: string;
-  avatar: string;
-  phone: string;
-  [key: string]: any;
-}
-
-export type SilentLoginStatus =
-  | 'SUCCESS'
-  | 'NEED_ONE_CLICK_LOGIN'
-  | 'CONTACT_SERVICE';
-
-export interface SilentLoginResult {
-  status: SilentLoginStatus;
-  businessBound?: boolean;
-  access_token?: string;
-  expire_in?: number;
-}
+export type SilentLoginResult = authApi.SilentLoginResult;
+export type SilentLoginStatus = authApi.SilentLoginStatus;
+export type UserInfo = userApi.UserInfo;
 
 export const AuthService = {
-  getToken(): string {
-    return wx.getStorageSync(TOKEN_KEY);
-  },
+  getToken,
 
-  setToken(token: string) {
-    wx.setStorageSync(TOKEN_KEY, token);
-  },
+  setToken,
 
-  removeToken() {
-    wx.removeStorageSync(TOKEN_KEY);
-  },
+  removeToken,
 
   getLoginCode(): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -53,14 +37,10 @@ export const AuthService = {
 
   async silentLogin(): Promise<SilentLoginResult> {
     const loginCode = await AuthService.getLoginCode();
-    const res: any = await request({
-      url: '/app/v1/auth/silent-login',
-      method: 'POST',
-      data: {
-        loginCode,
-        clientId: config.clientId,
-        grantType: config.grantType,
-      },
+    const res = await authApi.silentLogin({
+      loginCode,
+      clientId: config.clientId,
+      grantType: config.grantType,
     });
 
     const result = res?.data as SilentLoginResult;
@@ -82,26 +62,27 @@ export const AuthService = {
   },
 
   async bootstrapSession(): Promise<SilentLoginResult | null> {
-    try {
-      return await AuthService.silentLogin();
-    } catch (error) {
+    const currentPromise = getAuthBootstrapPromise();
+    if (currentPromise) {
+      return currentPromise as Promise<SilentLoginResult | null>;
+    }
+
+    const bootstrapPromise = AuthService.silentLogin().catch((error) => {
       console.error('AuthService silent login error:', error);
       return null;
-    }
+    });
+    setAuthBootstrapPromise(bootstrapPromise);
+    return bootstrapPromise;
   },
 
   async login(phoneCode: string): Promise<any> {
     try {
       const loginCode = await AuthService.getLoginCode();
-      const res: any = await request({
-        url: '/app/v1/auth/one-click-login',
-        method: 'POST',
-        data: {
-          loginCode,
-          phoneCode,
-          clientId: config.clientId,
-          grantType: config.grantType,
-        },
+      const res: any = await authApi.oneClickLogin({
+        loginCode,
+        phoneCode,
+        clientId: config.clientId,
+        grantType: config.grantType,
       });
 
       // 适配后端返回结构: { code: 200, data: { access_token: "..." } }
@@ -117,25 +98,9 @@ export const AuthService = {
     }
   },
 
-  async getUserInfo(): Promise<UserInfo> {
-    const res: any = await request({
-      url: '/app/v1/user',
-      method: 'POST',
-    });
-    return res.data || res;
-  },
-
-  async getReferralInfo(): Promise<any> {
-    const res: any = await request({
-      url: '/app/parties/referral-info',
-      method: 'GET',
-    });
-    return res.data || res;
-  },
-
   async checkSession(): Promise<boolean> {
     try {
-      await AuthService.getUserInfo();
+      await userApi.getUserInfo();
       return true;
     } catch (_e) {
       return false;
@@ -144,10 +109,7 @@ export const AuthService = {
 
   async logout(): Promise<void> {
     try {
-      await request({
-        url: '/app/v1/auth/logout',
-        method: 'POST',
-      });
+      await authApi.logout();
     } catch (e) {
       console.error('Logout API failed:', e);
     } finally {
@@ -157,10 +119,7 @@ export const AuthService = {
 
   async deleteAccount(): Promise<any> {
     try {
-      const res = await request({
-        url: '/app/v1/user/cancellation',
-        method: 'POST',
-      });
+      const res = await userApi.cancelAccount();
       return res;
     } finally {
       AuthService.removeToken();
