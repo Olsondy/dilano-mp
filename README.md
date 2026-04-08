@@ -19,14 +19,10 @@ pnpm run test:i18n
 
 - `工具 -> 构建 npm`
 
-## 3. 配置说明（开源安全模板）
-
-仓库只提交 `miniprogram/utils/config.example.ts`。
+## 3. 配置说明
 
 本地开发和发布时，复制一份为 `miniprogram/utils/config.ts` 并填入真实配置：
 
 ```bash
-Copy-Item miniprogram/utils/config.example.ts miniprogram/utils/config.ts
+cp miniprogram/utils/config.example.ts miniprogram/utils/config.ts
 ```
-
-`config.ts` 已加入 `.gitignore`，不要提交真实地址、clientId 或其他私有配置。

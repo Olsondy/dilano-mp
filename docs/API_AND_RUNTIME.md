@@ -30,12 +30,6 @@ wx.getAccountInfoSync().miniProgram.envVersion
 - `trial`
 - `release`
 
-仓库只提交 `miniprogram/utils/config.example.ts` 作为开源安全模板。首次本地开发或发布前，需要复制生成本地配置文件：
-
-```bash
-Copy-Item miniprogram/utils/config.example.ts miniprogram/utils/config.ts
-```
-
 `config.ts` 已加入 `.gitignore`，不要提交真实后端域名、`clientId` 或其他私有配置。
 
 每个环境至少维护：
@@ -52,11 +46,6 @@ export const config = {
   grantType: 'phone'
 };
 ```
-
-修改约束：
-
-- 新增环境或调整域名时，先同步 `config.example.ts` 的结构，再在本地 `config.ts` 写入真实值
-- 不要在业务页面里硬编码完整 API 域名
 
 ## Request Wrapper
 
