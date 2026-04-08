@@ -1,5 +1,5 @@
-import { request } from './request';
 import { config } from './config';
+import { request } from './request';
 
 const TOKEN_KEY = 'access_token';
 
@@ -11,37 +11,88 @@ export interface UserInfo {
   [key: string]: any;
 }
 
-export class AuthService {
-  static getToken(): string {
+export type SilentLoginStatus =
+  | 'SUCCESS'
+  | 'NEED_ONE_CLICK_LOGIN'
+  | 'CONTACT_SERVICE';
+
+export interface SilentLoginResult {
+  status: SilentLoginStatus;
+  businessBound?: boolean;
+  access_token?: string;
+  expire_in?: number;
+}
+
+export const AuthService = {
+  getToken(): string {
     return wx.getStorageSync(TOKEN_KEY);
-  }
+  },
 
-  static setToken(token: string) {
+  setToken(token: string) {
     wx.setStorageSync(TOKEN_KEY, token);
-  }
+  },
 
-  static removeToken() {
+  removeToken() {
     wx.removeStorageSync(TOKEN_KEY);
-  }
+  },
 
-  static getLoginCode(): Promise<string> {
+  getLoginCode(): Promise<string> {
     return new Promise((resolve, reject) => {
       wx.login({
         success: (res) => {
           if (res.code) {
             resolve(res.code);
           } else {
-            reject(new Error('wx.login failed: ' + res.errMsg));
+            reject(new Error(`wx.login failed: ${res.errMsg}`));
           }
         },
-        fail: reject
+        fail: reject,
       });
     });
-  }
+  },
 
-  static async login(phoneCode: string): Promise<any> {
+  async silentLogin(): Promise<SilentLoginResult> {
+    const loginCode = await AuthService.getLoginCode();
+    const res: any = await request({
+      url: '/app/v1/auth/silent-login',
+      method: 'POST',
+      data: {
+        loginCode,
+        clientId: config.clientId,
+        grantType: config.grantType,
+      },
+    });
+
+    const result = res?.data as SilentLoginResult;
+    if (!result || !result.status) {
+      throw new Error('Silent login failed: Invalid response structure');
+    }
+
+    if (result.status === 'SUCCESS') {
+      if (!result.access_token) {
+        throw new Error('Silent login failed: Missing access token');
+      }
+      AuthService.setToken(result.access_token);
+      return result;
+    }
+
+    // Explicitly clear stale token if silent login did not pass.
+    AuthService.removeToken();
+    return result;
+  },
+
+  async bootstrapSession(): Promise<SilentLoginResult | null> {
     try {
-      const loginCode = await this.getLoginCode();
+      return await AuthService.silentLogin();
+    } catch (error) {
+      console.error('AuthService silent login error:', error);
+      return null;
+    }
+  },
+
+  async login(phoneCode: string): Promise<any> {
+    try {
+      const loginCode = await AuthService.getLoginCode();
       const res: any = await request({
         url: '/app/v1/auth/one-click-login',
         method: 'POST',
@@ -49,13 +100,13 @@ export class AuthService {
           loginCode,
           phoneCode,
           clientId: config.clientId,
-          grantType: config.grantType
-        }
+          grantType: config.grantType,
+        },
       });
 
       // 适配后端返回结构: { code: 200, data: { access_token: "..." } }
-      if (res && res.data && res.data.access_token) {
-        this.setToken(res.data.access_token);
+      if (res?.data?.access_token) {
+        AuthService.setToken(res.data.access_token);
         return res;
       } else {
         throw new Error('Login failed: Invalid response structure');
@@ -64,57 +115,55 @@ export class AuthService {
       console.error('AuthService login error:', error);
       throw error;
     }
-  }
+  },
 
-  static async getUserInfo(): Promise<UserInfo> {
+  async getUserInfo(): Promise<UserInfo> {
     const res: any = await request({
       url: '/app/v1/user',
-      method: 'POST'
+      method: 'POST',
     });
     return res.data || res;
-  }
+  },
 
-  static async getReferralInfo(): Promise<any> {
+  async getReferralInfo(): Promise<any> {
     const res: any = await request({
       url: '/app/parties/referral-info',
-      method: 'GET'
+      method: 'GET',
     });
     return res.data || res;
-  }
-  
-  static async checkSession(): Promise<boolean> {
-      try {
-          await this.getUserInfo();
-          return true;
-      } catch (e) {
-          return false;
-      }
-  }
+  },
 
-  static async logout(): Promise<void> {
+  async checkSession(): Promise<boolean> {
+    try {
+      await AuthService.getUserInfo();
+      return true;
+    } catch (_e) {
+      return false;
+    }
+  },
+
+  async logout(): Promise<void> {
     try {
       await request({
         url: '/app/v1/auth/logout',
-        method: 'POST'
+        method: 'POST',
       });
     } catch (e) {
       console.error('Logout API failed:', e);
     } finally {
-      this.removeToken();
+      AuthService.removeToken();
     }
-  }
+  },
 
-  static async deleteAccount(): Promise<any> {
+  async deleteAccount(): Promise<any> {
     try {
       const res = await request({
         url: '/app/v1/user/cancellation',
-        method: 'POST'
+        method: 'POST',
       });
       return res;
-    } catch (e) {
-      throw e;
     } finally {
-      this.removeToken();
+      AuthService.removeToken();
     }
-  }
-}
+  },
+};

@@ -6,16 +6,19 @@ App<IAppOption>({
   globalData: {},
   onLaunch() {
     this.checkUpdate?.();
-    
-    // 展示本地存储能力
-    const logs = wx.getStorageSync('logs') || []
-    logs.unshift(Date.now())
-    wx.setStorageSync('logs', logs)
 
-    // Check session on launch
-    // If 401, the request interceptor will handle the redirection to mine page
-    AuthService.getUserInfo().catch(err => {
-      console.log('Session check failed or user not logged in:', err);
+    // 展示本地存储能力
+    const logs = wx.getStorageSync('logs') || [];
+    logs.unshift(Date.now());
+    wx.setStorageSync('logs', logs);
+
+    // Unified auth bootstrap entry: silent login on app launch.
+    AuthService.bootstrapSession().then((result) => {
+      if (!result) {
+        return;
+      }
+
+      console.log('Silent login status:', result.status);
     });
   },
 
@@ -25,7 +28,7 @@ App<IAppOption>({
   checkUpdate() {
     if (wx.canIUse('getUpdateManager')) {
       const updateManager = wx.getUpdateManager();
-      
+
       updateManager.onCheckForUpdate((res) => {
         if (res.hasUpdate) {
           console.log('>>> New version detected');
@@ -40,7 +43,7 @@ App<IAppOption>({
             if (res.confirm) {
               updateManager.applyUpdate();
             }
-          }
+          },
         });
       });
 
@@ -55,5 +58,5 @@ App<IAppOption>({
   },
   onHide() {
     HeartbeatService.stop();
-  }
-})
+  },
+});

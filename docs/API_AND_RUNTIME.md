@@ -105,6 +105,7 @@ HTTP `2xx` 下仍会检查业务码：
 
 从当前代码可见的接口包括：
 
+- `POST /app/v1/auth/silent-login`
 - `POST /app/v1/auth/one-click-login`
 - `POST /app/v1/auth/logout`
 - `POST /app/v1/user`
@@ -136,10 +137,10 @@ HTTP `2xx` 下仍会检查业务码：
 `onLaunch()` 中调用：
 
 ```ts
-AuthService.getUserInfo().catch(...)
+AuthService.bootstrapSession().then(...)
 ```
 
-用于在应用启动时尽早探测登录态。
+用于在应用启动时统一执行静默登录，并根据状态决定后续登录路径。
 
 ### 3. Heartbeat
 
@@ -192,6 +193,7 @@ AuthService.getUserInfo().catch(...)
 
 - 新增普通 JSON 接口时，默认只扩展 `request()` 调用点，不新增第二套网络封装。
 - 新增环境变量时，优先放到 `config.ts`，不要分散到页面常量。
+- `silent-login` 统一由 `App.onLaunch` 调用，避免页面层重复触发。
 - 修改心跳频率或路径时，务必同步检查 `App.onShow` / `onHide` 调用关系。
 - 不要在前端硬编码 token 到期倒计时或本地续期逻辑，除非后端协议已经明确变化并同步更新认证文档。
 - 修改 `app.json` 页面注册、tabBar 或窗口配置后，应同步更新 `AGENTS.md` 的项目结构与相关说明。

@@ -12,7 +12,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "",
+  "license": "MIT",
   "dependencies": {
     "tdesign-miniprogram": "^1.12.0"
   },
