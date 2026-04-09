@@ -1,10 +1,13 @@
 import * as authApi from '../api/auth';
 import * as userApi from '../api/user';
 import {
+  clearManualLogoutFlag,
   getAuthBootstrapPromise,
   getToken,
+  hasManualLogoutFlag,
   removeToken,
   setAuthBootstrapPromise,
+  setManualLogoutFlag,
   setToken,
 } from './auth-state';
 import { config } from './config';
@@ -52,6 +55,7 @@ export const AuthService = {
       if (!result.access_token) {
         throw new Error('Silent login failed: Missing access token');
       }
+      clearManualLogoutFlag();
       AuthService.setToken(result.access_token);
       return result;
     }
@@ -65,6 +69,12 @@ export const AuthService = {
     const currentPromise = getAuthBootstrapPromise();
     if (currentPromise) {
       return currentPromise as Promise<SilentLoginResult | null>;
+    }
+
+    if (hasManualLogoutFlag()) {
+      const skippedPromise = Promise.resolve(null);
+      setAuthBootstrapPromise(skippedPromise);
+      return skippedPromise;
     }
 
     const bootstrapPromise = AuthService.silentLogin().catch((error) => {
@@ -87,6 +97,7 @@ export const AuthService = {
 
       // 适配后端返回结构: { code: 200, data: { access_token: "..." } }
       if (res?.data?.access_token) {
+        clearManualLogoutFlag();
         AuthService.setToken(res.data.access_token);
         return res;
       } else {
@@ -113,6 +124,7 @@ export const AuthService = {
     } catch (e) {
       console.error('Logout API failed:', e);
     } finally {
+      setManualLogoutFlag();
       AuthService.removeToken();
     }
   },

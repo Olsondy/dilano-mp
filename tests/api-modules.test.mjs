@@ -13,7 +13,9 @@ import {
 
 function mockWx() {
   const requests = [];
-  const storage = {};
+  const storage = {
+    access_token: 'test-token',
+  };
 
   globalThis.wx = {
     getAccountInfoSync() {
@@ -50,6 +52,12 @@ function mockWx() {
       });
     },
   };
+  globalThis.getCurrentPages = () => [
+    {
+      route: 'pages/index/index',
+      onShow() {},
+    },
+  ];
 
   return { requests };
 }

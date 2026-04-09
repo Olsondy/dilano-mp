@@ -13,6 +13,7 @@ const files = [
   'miniprogram/custom-tab-bar/index.ts',
   'miniprogram/pages/index/index.ts',
   'miniprogram/pages/my/i18n.ts',
+  'miniprogram/pages/my/login-feedback.ts',
   'miniprogram/pages/my/mine.ts',
   'miniprogram/utils/auth-state.ts',
   'miniprogram/utils/auth.ts',

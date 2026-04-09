@@ -84,12 +84,7 @@
                     <view class="arrow-right"></view>
                 </view>
             </view>
-            <view class="menu-item" hover-class="item-active" bindtap="handleDeleteAccount">
-                <text class="item-text" style="color: #E5484D;">{{text.deleteAccount}}</text>
-                <view class="item-right">
-                    <view class="arrow-right"></view>
-                </view>
-            </view>
+            
         </view>
     </view>
 
@@ -100,6 +95,12 @@
                 <text class="item-text">{{text.about}}</text>
                 <view class="item-right">
                     <text class="value-text">{{text.footer}}</text>
+                </view>
+            </view>
+            <view class="menu-item" hover-class="item-active" bindtap="handleDeleteAccount">
+                <text class="item-text" style="color: #E5484D;">{{text.deleteAccount}}</text>
+                <view class="item-right">
+                    <view class="arrow-right"></view>
                 </view>
             </view>
         </view>

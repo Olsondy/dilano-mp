@@ -26,12 +26,14 @@
 - `miniprogram/utils/request.ts`
 - `miniprogram/utils/config.ts`
 - `miniprogram/app.ts`
+- `miniprogram/pages/my/login-feedback.ts`
 - `miniprogram/pages/my/mine.ts`
 - `miniprogram/pages/my/mine.wxml`
 
 ## Storage Keys
 
 - `access_token`: 当前登录态 token
+- `manual_logout`: 用户手动退出后的本地标记；存在时跳过启动静默登录
 - `auth_redirect`: 请求层判断用户未登录或 token 失效后写入，用于 mine 页首次展示登录弹层
 
 ## Silent Login Flow
@@ -54,6 +56,12 @@
   - `SUCCESS`：写入 `access_token`
   - `NEED_ONE_CLICK_LOGIN`：清理旧 token，等待用户在 mine 页手动授权登录
   - `CONTACT_SERVICE`：清理旧 token，保持未登录态（由后续业务页面决定提示方式）
+
+如果本地存在 `manual_logout`：
+
+- `bootstrapSession()` 会直接跳过 `silent-login`
+- 应用重新启动、重新编译或重新进入时都保持未登录态
+- 只有后续 `one-click-login` 成功后才会清除该标记
 
 ## One-Click Login Flow
 
@@ -101,6 +109,17 @@
 
 拿到 token 后通过 `setToken()` 存入本地。
 
+如果此前存在 `manual_logout`，一键登录成功时会同步清除这个标记，恢复后续启动时的 `silent-login` 能力。
+
+### 4. 登录失败提示
+
+`one-click-login` 通过 `request()` 发起时关闭了默认业务错误 toast，由 mine 页自行决定提示方式：
+
+- 业务码 `41010`（授权手机号与账号绑定手机号不一致）使用 `wx.showModal({ showCancel: false })` 阻断提示
+- 其他登录失败继续走页面级 toast
+
+这样可以避免请求层先弹一次 toast，页面层 catch 后再弹一次“登录失败”。
+
 ## Token Lifetime Model
 
 当前小程序 `access_token` 的有效期采用“双时钟”模型：
@@ -147,6 +166,7 @@ AuthService.bootstrapSession().then(...)
 - 读取 `access_token`
 - 注入 `Authorization` 请求头
 - 等待启动静默登录完成后再发起非 `silent-login` 请求
+- 对受保护接口在本地先检查 token；若当前没有 token，则直接走登录重定向，不再把请求发到后端
 - 统一处理认证失败、业务错误与 toast
 
 不要在业务页面直接调用裸 `wx.request` 去绕开这些逻辑，除非是上传、下载或流式等 `request()` 无法覆盖的特殊场景。
@@ -177,6 +197,8 @@ mine 页的 `onShow()` 会读取 `auth_redirect`：
 
 - 若存在，则移除该标记并显示登录弹层
 - 若不存在，则走 `checkLogin()` 主动拉取用户信息
+
+另外，mine 页 `checkLogin()` 现在会先判断本地是否存在 token；若没有 token，则直接切回游客态，不再额外请求 `/app/v1/user`。
 
 ## Disabled or Deleted Account
 
@@ -211,7 +233,15 @@ mine 页 `checkLogin()` 中：
 
 - `POST /app/v1/auth/logout`
 
-无论接口是否失败，`finally` 都会执行 `removeToken()`，保证本地退出。
+无论接口是否失败，`finally` 都会：
+
+- 写入 `manual_logout = true`
+- 执行 `removeToken()`
+
+这样可以保证“用户主动退出”与“token 失效被动登出”是两种不同语义：
+
+- 主动退出：后续启动不再 `silent-login`
+- 被动失效：后续启动仍允许 `silent-login`
 
 mine 页 `handleLogout()` 会：
 

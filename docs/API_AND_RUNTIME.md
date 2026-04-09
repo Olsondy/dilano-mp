@@ -76,6 +76,18 @@ export const config = {
 - 读取本地 `access_token`
 - 若 token 存在则注入 `Authorization: Bearer <token>`
 - 启动静默登录进行中时，除 `POST /app/v1/auth/silent-login` 自身外，其他请求会先等待静默登录完成，再读取最新 token 并发出
+- 除 `silent-login`、`one-click-login` 之外，当前接口默认按“需要登录”处理；如果本地没有 token，会先执行登录重定向并直接 reject，不再发送网络请求
+
+当前 `request()` 额外支持两个开关：
+
+- `requiresAuth?: boolean`：覆盖默认的鉴权要求
+- `showBusinessErrorToast?: boolean`：控制业务错误是否由请求层自动 toast
+
+认证状态还额外维护一个本地 `manual_logout` 标记：
+
+- 用户手动退出后写入
+- `App.onLaunch -> AuthService.bootstrapSession()` 检测到该标记时，会直接跳过 `silent-login`
+- 只有用户显式完成 `one-click-login` 后才清除
 
 当前 token 生命周期由后端控制：
 
@@ -89,7 +101,7 @@ export const config = {
 HTTP `2xx` 下仍会检查业务码：
 
 - `data.code === 200` 或无业务码，视为成功
-- 其他业务码视为失败，并弹出 `wx.showToast`
+- 其他业务码视为失败；默认弹出 `wx.showToast`，但调用方可以通过 `showBusinessErrorToast: false` 自己接管交互
 
 非 `2xx` 或请求失败时：
 
@@ -159,6 +171,8 @@ AuthService.bootstrapSession().then(...)
 
 `bootstrapSession()` 会登记一个共享启动 promise，请求层会读取该状态来避免首页、我的页或心跳在 token 刷新完成前携带旧 token 发起请求。
 
+如果本地存在 `manual_logout`，这个启动 promise 会直接 resolve 为 `null`，不会向后端发送 `silent-login` 请求。
+
 ### 3. Heartbeat
 
 - `onShow()` -> `HeartbeatService.start()`
@@ -191,12 +205,15 @@ AuthService.bootstrapSession().then(...)
 - 支持下拉刷新
 - 骨架屏数量会按设备窗口高度动态计算
 - 后端数据通过 `mapBackendToUI()` 转成页面展示结构
+- 当页面在已退出登录或无 token 状态下恢复时，项目列表请求会先被请求层本地拦截并重定向到 mine 页，不会再把旧页面请求发到后端
 
 ### `pages/my/mine.ts`
 
 - `onShow()` 时应用当前语言、同步 tabBar
 - 读取 `auth_redirect` 决定是否直接弹出登录框
+- 本地没有 token 时直接切游客态，不再请求 `/app/v1/user`
 - 登录成功、退出登录、注销账号后都直接刷新本页状态
+- `41010` 登录错误使用阻断式 modal，而不是默认 toast
 
 ### `pages/webview/index.ts`
 

@@ -1,4 +1,4 @@
-import { AUTH_SILENT_LOGIN_URL } from '../api/routes';
+import { AUTH_ONE_CLICK_LOGIN_URL, AUTH_SILENT_LOGIN_URL } from '../api/routes';
 import { getAuthBootstrapPromise, getToken, removeToken } from './auth-state';
 import { config } from './config';
 
@@ -7,6 +7,35 @@ interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
   data?: any;
   header?: any;
+  requiresAuth?: boolean;
+  showBusinessErrorToast?: boolean;
+}
+
+const PUBLIC_AUTH_URLS = new Set([
+  AUTH_SILENT_LOGIN_URL,
+  AUTH_ONE_CLICK_LOGIN_URL,
+]);
+
+function redirectToLogin() {
+  removeToken();
+
+  const pages = getCurrentPages();
+  const currentPage = pages[pages.length - 1];
+  const route = currentPage ? currentPage.route : '';
+
+  wx.setStorageSync('auth_redirect', true);
+
+  if (route !== 'pages/my/mine') {
+    wx.switchTab({
+      url: '/pages/my/mine',
+    });
+    return;
+  }
+
+  const page = getCurrentPages().pop();
+  if (page?.onShow) {
+    page.onShow();
+  }
 }
 
 export const request = async <T>(options: RequestOptions): Promise<T> => {
@@ -15,7 +44,13 @@ export const request = async <T>(options: RequestOptions): Promise<T> => {
     await authBootstrapPromise;
   }
 
+  const requiresAuth =
+    options.requiresAuth ?? !PUBLIC_AUTH_URLS.has(options.url);
   const token = getToken();
+  if (requiresAuth && !token) {
+    redirectToLogin();
+    throw { code: 401, message: 'Unauthorized' };
+  }
 
   const header: Record<string, any> = {
     'Content-Type': 'application/json',
@@ -53,26 +88,7 @@ export const request = async <T>(options: RequestOptions): Promise<T> => {
 
         if (isHttp401 || isBusiness401 || isUserNotExist) {
           // Token 过期或未登录
-          removeToken();
-
-          // 获取当前页面栈
-          const pages = getCurrentPages();
-          const currentPage = pages[pages.length - 1];
-          const route = currentPage ? currentPage.route : '';
-
-          // 标记需要弹窗
-          wx.setStorageSync('auth_redirect', true);
-
-          // 避免在已经是 mine 页面时重复跳转
-          if (route !== 'pages/my/mine') {
-            wx.switchTab({
-              url: '/pages/my/mine',
-            });
-          } else {
-            // 如果已经在 mine 页面，手动刷新一下状态或调用显示方法
-            const page = getCurrentPages().pop();
-            if (page) page.onShow();
-          }
+          redirectToLogin();
 
           // Show specific message for user errors if needed, or just standard Unauthorized
           const msg = isUserNotExist
@@ -87,11 +103,13 @@ export const request = async <T>(options: RequestOptions): Promise<T> => {
           const data = res.data as any;
           if (data?.code && data.code !== 200) {
             // Business Error
-            wx.showToast({
-              title: data.msg || '请求失败',
-              icon: 'none',
-              duration: 2000,
-            });
+            if (options.showBusinessErrorToast !== false) {
+              wx.showToast({
+                title: data.msg || '请求失败',
+                icon: 'none',
+                duration: 2000,
+              });
+            }
             reject(data);
           } else {
             // Success

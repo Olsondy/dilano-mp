@@ -43,6 +43,7 @@ export const oneClickLogin = (data: OneClickLoginParams) =>
     url: AUTH_ONE_CLICK_LOGIN_URL,
     method: 'POST',
     data,
+    showBusinessErrorToast: false,
   });
 
 export const logout = () =>

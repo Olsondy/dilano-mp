@@ -10,6 +10,7 @@ import {
   setCurrentLang,
 } from '../../utils/i18n';
 import mineI18n, { mineRoleI18n } from './i18n';
+import { presentLoginError } from './login-feedback';
 
 const defaultLang: LangType = 'en';
 const getText = (lang: LangType) => getI18nText(mineI18n, lang);
@@ -133,6 +134,11 @@ Page({
   },
 
   async checkLogin() {
+    if (!AuthService.getToken()) {
+      this.setData(this.getLoggedOutState(this.data.currentLang));
+      return;
+    }
+
     try {
       const userInfo = await getUserInfo();
       let commission = '0.00';
@@ -237,10 +243,23 @@ Page({
       this.checkLogin();
     } catch (err: any) {
       wx.hideLoading();
-      Toast({
-        context: this,
-        selector: '#t-toast',
-        message: err.message || this.data.text.loginFailed,
+      presentLoginError(err, {
+        confirmTitle: this.data.text.confirmTitle,
+        fallbackMessage: this.data.text.loginFailed,
+        showConfirm: (message, title) => {
+          wx.showModal({
+            title,
+            content: message,
+            showCancel: false,
+          });
+        },
+        showToast: (message) => {
+          Toast({
+            context: this,
+            selector: '#t-toast',
+            message,
+          });
+        },
       });
     }
   },
