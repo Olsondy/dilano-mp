@@ -34,6 +34,9 @@ const defaultLang: LangType = 'en';
 const getText = (lang: LangType) => getI18nText(indexI18n, lang);
 type IndexText = ReturnType<typeof getText>;
 
+// TEMP: Empty-state preview. Set to false to restore backend project data.
+const FORCE_EMPTY_STATE_PREVIEW = false;
+
 Page({
   data: {
     currentLang: defaultLang as LangType,
@@ -92,6 +95,11 @@ Page({
 
   async initData() {
     this.setData({ loading: true });
+
+    if (FORCE_EMPTY_STATE_PREVIEW) {
+      this.setData({ loading: false, projectsData: [], displayTimeline: [] });
+      return;
+    }
 
     try {
       const res = await getCustomerProjects();
