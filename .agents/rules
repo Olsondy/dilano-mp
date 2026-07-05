@@ -1,10 +1,13 @@
-# Linear/Vercel Design System - Agent Rules
+# DILANO Customer UI Design - Agent Rules
 
 You are a specialized UI/UX Agent. When modifying or creating code for this project, you MUST strictly follow the design tokens and principles defined below.
 
-## 1. Visual Identity (Linear/Vercel Style)
+## 1. Visual Identity (Linear-led Customer UI)
+- **Decision Weights**: Linear 45%, Apple HIG 30%, Stripe 15%, GitHub 5%, Arc 5%.
+- **Meaning**: Weights resolve design conflicts; they are not pixel or component quotas.
+- **Priority**: Platform requirements, usability, and accessibility override all weights.
 - **Contrast**: Monochrome base (#FFFFFF / #171717) with functional color accents.
-- **Precision**: 1px borders (#EAEAEA) over drop shadows. 
+- **Precision**: Use a neutral hairline plus a low-opacity shadow for floating cards; never use black outlines for active cards.
 - **Typography**: 
   - Sans-serif for UI (Inter/System).
   - **MANDATORY**: Use Monospace ('Courier New', monospace) for all numerical data, IDs, and timestamps.
@@ -16,16 +19,24 @@ You are a specialized UI/UX Agent. When modifying or creating code for this proj
   - Single cards MUST expand to 100% width and show a data grid.
 - **Progress Bars**: Every project card should feature a subtle progress bar (6rpx height) mapped to the `projectPhase`.
 - **Status Indicators**: Always group the status dot and the label inside a gray pill badge.
-- **Ghost Cards**: Use dashed borders and terminal-style animations for empty states.
+- **Empty States**: Use direct customer-facing copy, a simple geometric visual, and an explicit recovery action. Avoid terminal language, blinking cursors, and decorative pulse effects.
 
-## 3. Mini Program Specifics
+## 3. Influence Boundaries
+- Use Linear for structure, hierarchy, cards, and information density.
+- Use Apple HIG for touch behavior, feedback, motion, readability, and accessibility.
+- Use Stripe for CTA, login, service, trust, and brand emphasis.
+- Use GitHub for project status, timelines, and structured data.
+- Use Arc for floating navigation and overlay spatial relationships.
+- Vercel and Raycast are supporting references only. They have no independent weight and must not introduce developer-tool or command-line interaction into customer-facing flows.
+
+## 4. Mini Program Specifics
 - **Platform Buffer**: Always add +20rpx buffer to fixed-height containers to account for OS-level font rendering differences.
 - **Safe Area**: Strictly respect `env(safe-area-inset-bottom)`.
 - **Glassmorphism**: Use `backdrop-filter: blur(20px)` for floating navigation bars.
 
-## 4. Code Standards
+## 5. Code Standards
 - Use **LESS** for styles with consistent variables.
 - Implement **Data Adapters** in `.ts` files to transform raw backend data into the UI schema defined in the `UIProject` interface.
 - Dynamic **Skeleton Screens** must be calculated in `onLoad` to perfectly fill the remaining viewport height.
 
-Refer to `DESIGN_GUIDE.md` for full specifications. No UI changes should deviate from this "Geek/Pro" aesthetic.
+Refer to `docs/DESIGN_LANGUAGE.md` and `docs/UI_DESIGN.md` for full specifications. Keep customer-facing flows calm, clear, and professional.

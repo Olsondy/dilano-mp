@@ -109,7 +109,7 @@ Use these rules across IDE agents when executing tasks in this repository:
 - After i18n changes -> Update [docs/INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md)
 - After request/lifecycle/env changes -> Update [docs/API_AND_RUNTIME.md](docs/API_AND_RUNTIME.md)
 - After adding or removing pages/routes -> Update the `## Project Structure` outline in [AGENTS.md](AGENTS.md)
-- After UI component changes -> Update [docs/UI_DESIGN.md](docs/UI_DESIGN.md)
+- After UI/UX changes -> Update [docs/DESIGN_LANGUAGE.md](docs/DESIGN_LANGUAGE.md), [docs/UI_DESIGN.md](docs/UI_DESIGN.md), or [docs/ENGINEERING_RULES.md](docs/ENGINEERING_RULES.md) according to the affected layer
 
 Documentation should reflect the actual implementation, not intended behavior.
 
@@ -136,7 +136,11 @@ Documentation should reflect the actual implementation, not intended behavior.
 
 ### UI Component Pattern
 
-在创建或调整界面前，先阅读 [docs/UI_DESIGN.md](docs/UI_DESIGN.md)。
+在创建或调整界面前，按顺序阅读 UI/UX 规范：
+
+1. [docs/DESIGN_LANGUAGE.md](docs/DESIGN_LANGUAGE.md) - 为什么这样设计，理解设计哲学、信息密度、色彩、动效和小程序约束。
+2. [docs/UI_DESIGN.md](docs/UI_DESIGN.md) - 页面和组件应该怎么呈现，确认 token、页面模式、组件模式、状态和 TDesign 使用边界。
+3. [docs/ENGINEERING_RULES.md](docs/ENGINEERING_RULES.md) - 代码应该怎么组织，按小程序工程规则实现 WXML / TS / Less / i18n / 组件 API。
 
 当前仓库的 UI 实现模式：
 
@@ -145,6 +149,16 @@ Documentation should reflect the actual implementation, not intended behavior.
 - 页面文案与视觉状态通常按“页面 TS + 页面 WXML + 页面 Less + 页面 i18n.ts”四件套维护。
 - TDesign 仅作为局部交互组件补充，不要把整个页面改造成高度依赖第三方组件的实现。
 - 首页和我的页面已经形成两套可复用样式范式：卡片/时间线页、资料/菜单/弹层页；新增页面优先参考相近模式。
+
+DDS 核心执行规则：
+
+- 未被明确要求时，不重新设计现有组件。
+- 优先复用已有模式，不为单页发明新视觉语言。
+- 每个页面只保留一个主要任务。
+- 遵循微信小程序交互模式和真机安全区约束。
+- 优先用边框建立层级，阴影只用于轻微浮起或激活状态。
+- 动效用于解释状态变化，不用于装饰。
+- 数值、日期、金额、统计值等结构化数据使用 monospace。
 
 ### Adding New Components
 **IMPORTANT**: NEVER manually add components to `src/components/ui`.
@@ -170,7 +184,8 @@ dln-customer/
 ├─ docs/
 │  ├─ API_AND_RUNTIME.md
 │  ├─ AUTHENTICATION.md
-│  ├─ DESIGN_GUIDE.md
+│  ├─ DESIGN_LANGUAGE.md
+│  ├─ ENGINEERING_RULES.md
 │  ├─ INTERNATIONALIZATION.md
 │  ├─ MINIPROGRAM_STANDARDS.md
 │  └─ UI_DESIGN.md
@@ -265,18 +280,21 @@ The project has detailed documentation for each domain. **ALWAYS read the releva
 
 ### Read When Relevant:
 
+- **[docs/DESIGN_LANGUAGE.md](docs/DESIGN_LANGUAGE.md)**
+  - When changing visual principles, page hierarchy, color meaning, motion language, or the overall UI/UX direction
+  - Covers: DILANO design philosophy, information architecture, visual identity, typography, motion, page principles, AI generation rules
+
 - **[docs/UI_DESIGN.md](docs/UI_DESIGN.md)**
   - When creating/modifying WXML/Less, page layouts, shared components, or popup/card/timeline UI
-  - Covers: 视觉 token、页面布局模式、组件复用方式、TDesign 使用边界
+  - Covers: 视觉 token、页面布局模式、组件呈现方式、状态展示、TDesign 使用边界
+
+- **[docs/ENGINEERING_RULES.md](docs/ENGINEERING_RULES.md)**
+  - When organizing UI code, adding reusable components, changing Less/token usage, assets, navigation, tabBar, or UI verification rules
+  - Covers: 页面四件套、组件 API、样式组织、TDesign 工程边界、资源目录、验证流程
 
 - **[docs/MINIPROGRAM_STANDARDS.md](docs/MINIPROGRAM_STANDARDS.md)**
   - When adding pages, components, assets, or checking general mini program engineering conventions
   - Covers: 目录基线、Build npm、页面/组件文件组成、生成物约束
-
-- **[docs/DESIGN_GUIDE.md](docs/DESIGN_GUIDE.md)**
-  - When you need the original visual inspiration or legacy design direction
-  - Covers: Linear / Vercel 风格来源说明
-  - Note: 以 [docs/UI_DESIGN.md](docs/UI_DESIGN.md) 的当前仓库落地规则为准
 
 ## Quick Reference
 
