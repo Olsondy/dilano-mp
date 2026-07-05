@@ -74,18 +74,19 @@
       </swiper-item>
     </swiper>
 
-    <!-- 2. Empty State: The "Ghost" Card -->
+    <!-- 2. Customer-facing Empty State -->
     <view wx:else class="empty-card-container">
-        <view class="ghost-card" bindtap="onPullDownRefresh">
-            <view class="ghost-icon">
-                <view class="g-circle"></view>
-                <view class="g-pulse"></view>
+        <view class="empty-card">
+            <view class="empty-visual">
+                <view class="empty-visual-back"></view>
+                <view class="empty-visual-front">
+                    <view class="empty-visual-line empty-visual-line-primary"></view>
+                    <view class="empty-visual-line"></view>
+                </view>
             </view>
-            <view class="ghost-text">{{text.noProjects}}</view>
-            <view class="ghost-sub">
-                <text>{{text.statusIdle}}</text>
-                <text class="blink">_</text>
-            </view>
+            <view class="empty-title">{{text.noProjects}}</view>
+            <view class="empty-description">{{text.emptyProjectsHint}}</view>
+            <view class="empty-action" bindtap="onPullDownRefresh">{{text.refreshProjects}}</view>
         </view>
     </view>
 
